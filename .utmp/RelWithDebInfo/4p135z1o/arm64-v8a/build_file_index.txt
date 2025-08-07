@@ -1,0 +1,2 @@
+D:\GitHub-Repositories\(FJU)-AR-English-Word-Learning-Monopoly-Game\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+D:\GitHub-Repositories\(FJU)-AR-English-Word-Learning-Monopoly-Game\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

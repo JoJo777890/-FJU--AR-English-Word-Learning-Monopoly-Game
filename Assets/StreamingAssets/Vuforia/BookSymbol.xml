@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="V4_Book_Symbol_4_Camera_Captured" size="0.300000 0.249844" />
+    <ImageTarget name="V4_Book_Symbol_3_Camera_Captured" size="0.300000 0.255711" />
+    <ImageTarget name="V4_Book_Symbol_2_Camera_Captured" size="0.300000 0.245835" />
+    <ImageTarget name="V4_Book_Symbol_1_Camera_Captured" size="0.300000 0.254108" />
+  </Tracking>
+</QCARConfig>

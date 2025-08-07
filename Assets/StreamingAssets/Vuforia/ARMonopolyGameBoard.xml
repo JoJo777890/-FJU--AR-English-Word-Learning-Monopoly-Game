@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig xsi:noNamespaceSchemaLocation="qcar_config.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Tracking>
+        <ImageTarget name="corner4-botton-right" size="0.060000 0.049969"/>
+        <ImageTarget name="corner3-bottom-left" size="0.060000 0.051142"/>
+        <ImageTarget name="corner2-top-right" size="0.060000 0.049167"/>
+        <ImageTarget name="corner1-top-left" size="0.060000 0.050822"/>
+        <!--
+		<ImageTarget name="MonopolyBoard.Bottom" size="0.210000 0.210000"/>
+        <ImageTarget name="MonopolyBoard.Top" size="0.210000 0.210000"/>
+		-->
+		<MultiTarget name="MonopolyBoard">
+			<Part name="corner1-top-left" translation="-0.075 0.075 0" rotation="AD: 1 0 0 0"/>
+			<Part name="corner2-top-right" translation="0.075 0.075 0" rotation="AD: 1 0 0 0"/>
+			<Part name="corner3-bottom-left" translation="-0.075 -0.075 0" rotation="AD: 1 0 0 0"/>
+			<Part name="corner4-bottom-right" translation="0.075 -0.075 0" rotation="AD: 1 0 0 0"/>
+        </MultiTarget>
+    </Tracking>
+</QCARConfig>

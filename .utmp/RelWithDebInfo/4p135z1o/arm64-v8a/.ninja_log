@@ -1,0 +1,19 @@
+# ninja log v5
+58	1750	7750911385768533	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	2516be12aac200d2
+34	1747	7750911385768533	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	dba304f44cfc84a0
+82	1785	7750911386371122	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e8312bbe185ed367
+1	1748	7750911385778637	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	20db5b60e1bfd8a4
+14	1751	7750911385995106	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	8b6991fe955ff3cd
+70	1745	7750911385899693	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	5d84819b5ee4466
+46	1894	7750911387455274	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	98d8267f9f0c294e
+1984	2244	7750911390975126	D:/GitHub-Repositories/(FJU)-AR-English-Word-Learning-Monopoly-Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/4p135z1o/obj/arm64-v8a/libgame.so	c526d4bf5413316
+23	1984	7750911388335951	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	a12af0b6c10b79c9
+78	1581	7760202159909611	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	2516be12aac200d2
+52	1582	7760202159909611	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	dba304f44cfc84a0
+15	1611	7760202160221800	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	20db5b60e1bfd8a4
+43	1623	7760202160327556	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	5d84819b5ee4466
+33	1685	7760202160943187	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	8b6991fe955ff3cd
+67	1856	7760202162670531	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	98d8267f9f0c294e
+25	1925	7760202163354717	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	a12af0b6c10b79c9
+91	1936	7760202163434824	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	e8312bbe185ed367
+1936	2132	7760202165379083	D:/GitHub-Repositories/(FJU)-AR-English-Word-Learning-Monopoly-Game/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/4p135z1o/obj/arm64-v8a/libgame.so	c526d4bf5413316
