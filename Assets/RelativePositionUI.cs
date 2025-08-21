@@ -6,7 +6,7 @@ public class RelativePositionUI : MonoBehaviour
     public GameObject targetA;
     public GameObject targetB;
 
-    public TextMeshProUGUI infoText; // Assign this in the Inspector
+    public TextMeshProUGUI infoText;
 
     void Update()
     {

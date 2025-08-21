@@ -5,7 +5,7 @@ public class PlayerLandedPropertyUI : MonoBehaviour
 {
     public static PlayerLandedPropertyUI Instance { get; private set; }
 
-    public TextMeshProUGUI infoText; // Assign this in the Inspector
+    public TextMeshProUGUI infoText;
 
     void Awake()
     {

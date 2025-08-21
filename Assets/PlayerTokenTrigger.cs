@@ -5,7 +5,7 @@ using Vuforia;
 
 public class PlayerTokenTrigger : MonoBehaviour
 {
-    public List<ObserverBehaviour> propertyTargets; // Assign all properties in Inspector
+    public List<ObserverBehaviour> propertyTargets;
     public float triggerDistance = 0.3f;
 
     private string PlayerLandedPropertyUIText;
