@@ -35,11 +35,11 @@ public class PlayerTokenTrigger : MonoBehaviour
 
                 // Comment: Detection: 0.3f on "Y-axis" above overlap Player & Property
                 // Comment: "World Center Mode": "SPECIFIC" (Position used by Unity originally)
-                //float distance = Vector3.Distance(transform.position, property.transform.position + new Vector3(0f, 0.3f, 0f));
+                //float distance = Vector3.Distance(transform.position, property.transform.position + new Vector3(0f, 0.3f, 0f)); //之後改成 + new Vector3(0f, triggerDistance, 0f)
 
                 // Comment: Detection: 0.3f on "Z-axis" above overlap Player & Property
                 // Comment: "World Center Mode": "DEVICE" (Postion used by Vuforia AR Camera)
-                float distance = Vector3.Distance(transform.position, property.transform.position + new Vector3(0f, 0f, 0.3f));
+                float distance = Vector3.Distance(transform.position, property.transform.position + new Vector3(0f, 0f, 0.3f)); //之後改成 + new Vector3(0f, 0f, triggerDistance)
 
                 PlayerLandedPropertyUIText += $"Distance{distanceNum + 1}: {distance:F3}";
 
