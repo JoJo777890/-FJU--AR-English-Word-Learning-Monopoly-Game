@@ -11,8 +11,11 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/MonopolyTestground2 - BookSymbol_Test.unity
     guid: e723e02060f528f458414766a36d72f8
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MonopolyTestground3 - BoardDemo.unity
     guid: 0dacb3a62f3ed434db8955d609ba6c9d
+  - enabled: 1
+    path: Assets/Scenes/MonopolyTestground4 - PatternGeneration_ImageTarget.unity
+    guid: d33e09949f4bd0246893233dbedcfb7e
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
