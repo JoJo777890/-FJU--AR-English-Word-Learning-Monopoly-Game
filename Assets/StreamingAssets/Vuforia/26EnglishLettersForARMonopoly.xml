@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="Test2-ImageTarget---t---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
+    <ImageTarget name="Test2-ImageTarget---m---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
+    <ImageTarget name="Test2-ImageTarget---c---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
+    <ImageTarget name="Test2-ImageTarget---a---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
     <ImageTarget name="Test-ImageTarget---Generated-Pattern-1" size="0.040000 0.030000" />
   </Tracking>
 </QCARConfig>
