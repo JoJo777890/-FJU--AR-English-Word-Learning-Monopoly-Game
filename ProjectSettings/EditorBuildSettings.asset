@@ -14,8 +14,11 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/MonopolyTestground3 - BoardDemo.unity
     guid: 0dacb3a62f3ed434db8955d609ba6c9d
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MonopolyTestground4 - PatternGeneration_ImageTarget.unity
     guid: d33e09949f4bd0246893233dbedcfb7e
+  - enabled: 1
+    path: Assets/Scenes/MonopolyTestground5 - Interacting With Locations.unity
+    guid: b86b4a1e8ea9eb14d9e4fe58cfa1aa8b
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
