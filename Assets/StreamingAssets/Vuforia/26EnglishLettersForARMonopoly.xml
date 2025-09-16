@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig>
   <Tracking>
+    <ImageTarget name="Location_D---Patterned" size="0.050000 0.067692" />
+    <ImageTarget name="Location_C---Patterned" size="0.050000 0.067692" />
+    <ImageTarget name="Location_B---Patterned" size="0.050000 0.067692" />
+    <ImageTarget name="Location_A---Patterned" size="0.050000 0.067692" />
     <ImageTarget name="Test2-ImageTarget---t---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
     <ImageTarget name="Test2-ImageTarget---m---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
     <ImageTarget name="Test2-ImageTarget---c---Test_Font_650-Area_800x800---Width-0_05m" size="0.050000 0.050000" />
