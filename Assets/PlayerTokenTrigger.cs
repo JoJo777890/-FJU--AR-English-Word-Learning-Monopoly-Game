@@ -1,20 +1,37 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Vuforia;
 
 public class PlayerTokenTrigger : MonoBehaviour
 {
     public List<ObserverBehaviour> propertyTargets;
-    public float triggerDistance = 0.04f;
-
-    private string PlayerLandedPropertyUIText;
+    public float triggerDistance = 0.07f;
+    public float scaleUpFactor = 1.3f;      // how much bigger when close
+    public string contentSuffix = "Plane";  // only scale children whose names end with this
 
     private ObserverBehaviour playerObserver;
+    private string PlayerLandedPropertyUIText;
+
+    // original scales per content child
+    private readonly Dictionary<Transform, Vector3> baseScale = new();
 
     void Start()
     {
         playerObserver = GetComponent<ObserverBehaviour>();
+
+        // cache original scales of content children
+        foreach (var prop in propertyTargets)
+        {
+            if (prop == null) continue;
+            foreach (Transform child in prop.transform)
+            {
+                if (child.name.EndsWith(contentSuffix))
+                {
+                    if (!baseScale.ContainsKey(child))
+                        baseScale[child] = child.localScale;
+                }
+            }
+        }
     }
 
     void Update()
@@ -24,65 +41,31 @@ public class PlayerTokenTrigger : MonoBehaviour
         if (playerObserver == null || playerObserver.TargetStatus.Status < Status.TRACKED)
             return;
 
-        int distanceNum = 0;
-
-        foreach (ObserverBehaviour property in propertyTargets)
+        int i = 0;
+        foreach (var prop in propertyTargets)
         {
-            if (property != null && property.TargetStatus.Status >= Status.TRACKED)
+            if (prop == null || prop.TargetStatus.Status < Status.TRACKED) { i++; continue; }
+
+            // simple distance (no artificial offset)
+            float distance = Vector3.Distance(transform.position, prop.transform.position);
+            bool isClose = distance < triggerDistance;
+
+            PlayerLandedPropertyUIText += $"Distance{i + 1}: {distance:F3}" + (isClose ? " (Landed)\n" : "\n");
+
+            // scale ONLY the content child(ren), not the ImageTarget root
+            foreach (Transform child in prop.transform)
             {
-                // Comment: Detection: Overlap Player & Property
-                //float distance = Vector3.Distance(transform.position, property.transform.position);
+                if (!child.name.EndsWith(contentSuffix)) continue;
 
-                // Comment: Detection: 0.3f on "Y-axis" above overlap Player & Property
-                // Comment: "World Center Mode": "SPECIFIC" (Position used by Unity originally)
-                //float distance = Vector3.Distance(transform.position, property.transform.position + new Vector3(0f, triggerDistance, 0f)); 
+                Vector3 orig = baseScale.TryGetValue(child, out var s) ? s : child.localScale;
+                child.localScale = isClose ? orig * scaleUpFactor : orig;
 
-                // Comment: Detection: 0.3f on "Z-axis" above overlap Player & Property
-                // Comment: "World Center Mode": "DEVICE" (Postion used by Vuforia AR Camera)
-                float distance = Vector3.Distance(transform.position, property.transform.position + new Vector3(0f, 0f, triggerDistance)); 
-
-                PlayerLandedPropertyUIText += $"Distance{distanceNum + 1}: {distance:F3}";
-
-                if (distance < triggerDistance)
-                {
-                    TriggerPropertyEffect(property);
-                    PlayerLandedPropertyUIText += $"(Landed)";
-                }
-
-                PlayerLandedPropertyUIText += $"\n";
+                if (!child.gameObject.activeSelf) child.gameObject.SetActive(true);
             }
 
-            distanceNum++;
+            i++;
         }
 
         PlayerLandedPropertyUI.Instance.UpdateUI(PlayerLandedPropertyUIText);
-    }
-
-    void TriggerPropertyEffect(ObserverBehaviour property)
-    {
-        HideAllAnimals();
-
-        foreach (Transform child in property.transform)
-        {
-            if (child.name.EndsWith("Plane")) // Add ([Condition])([ || child.name.EndsWith("Model") ]) if you want 3D model to show up as well.
-            {
-                child.gameObject.SetActive(true);
-            }
-        }
-
-        Debug.Log("Landed on: " + property.TargetName);
-    }
-    void HideAllAnimals()
-    {
-        foreach (ObserverBehaviour property in propertyTargets)
-        {
-            foreach (Transform child in property.transform)
-            {
-                if (child.name.EndsWith("Plane")) // Add ([Condition])([ || child.name.EndsWith("Model") ]) if you want 3D model to show up as well.
-                {
-                    child.gameObject.SetActive(false);
-                }
-            }
-        }
     }
 }
