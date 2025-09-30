@@ -5292,9 +5292,11 @@ GameObject:
   - component: {fileID: 1417388417}
   - component: {fileID: 1417388416}
   - component: {fileID: 1417388415}
+  - component: {fileID: 1417388420}
   - component: {fileID: 1417388419}
+  - component: {fileID: 1417388421}
   m_Layer: 0
-  m_Name: ImageTargetT (t_Pattern)
+  m_Name: ImageTargetT (t_Player)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5390,7 +5392,7 @@ MonoBehaviour:
   mMotionHint: 1
   mTrackingOptimization: 0
   mTrackingOptimizationNeedsUpgrade: 0
-  mPreview: {fileID: 1417388419}
+  mPreview: {fileID: 1417388421}
 --- !u!4 &1417388418
 Transform:
   m_ObjectHideFlags: 0
@@ -5408,6 +5410,43 @@ Transform:
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -90.181, y: 0, z: 0}
 --- !u!114 &1417388419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417388413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00047f5711538714babf307789e9284b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  propertyTargets:
+  - {fileID: 979547119}
+  - {fileID: 2135861381}
+  - {fileID: 377782775}
+  - {fileID: 1653313863}
+  triggerDistance: 0.07
+  dwellSeconds: 0.35
+  scaleUpFactor: 1.3
+  contentSuffix: Plane
+--- !u!114 &1417388420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1417388413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8713993debd49d74782bb632ac985ce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerId: 2
+  playerName: Player 2
+  startingMoney: 1500
+  money: 0
+--- !u!114 &1417388421
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
