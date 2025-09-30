@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Vuforia;
 
-public class PlayerTokenTrigger : MonoBehaviour
+public class OldPlayerTokenTrigger : MonoBehaviour
 {
     public List<ObserverBehaviour> propertyTargets;
     public float triggerDistance = 0.07f;
