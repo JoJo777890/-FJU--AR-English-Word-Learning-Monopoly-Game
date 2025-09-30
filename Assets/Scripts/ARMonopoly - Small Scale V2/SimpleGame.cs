@@ -1,56 +1,51 @@
 // Assets/Scripts/Simple/SimpleGame.cs
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ARMonopoly.Simple
 {
     public static class SimpleGame
     {
-        // propertyId -> ownerId (-1 if unowned)
-        private static readonly Dictionary<string, int> owner = new();
-        // playerId -> money (mirror what's in PlayerTag for UI consistency)
-        private static readonly Dictionary<int, int> money = new();
+        private static readonly Dictionary<string,int> owner = new(); // propertyId -> ownerId (-1 none)
+        private static readonly Dictionary<int,int> money = new();    // playerId -> money
 
         public static void RegisterPlayer(PlayerTag p)
         {
             if (!money.ContainsKey(p.playerId)) money[p.playerId] = p.money;
-        }
-
-        public static int GetOwner(string propId)
-        {
-            return owner.TryGetValue(propId, out var o) ? o : -1;
+            GameEvents.RaiseMoneyChanged(new MoneyChanged{ playerId = p.playerId, money = money[p.playerId] });
         }
 
         public static int GetMoney(int playerId) => money.TryGetValue(playerId, out var m) ? m : 0;
+        public static int GetOwner(string propId) => owner.TryGetValue(propId, out var o) ? o : -1;
 
-        public static bool CanBuy(PlayerTag p, PropertyTag prop) =>
-            GetOwner(prop.propertyId) == -1 && GetMoney(p.playerId) >= prop.price;
-
-        public static bool Buy(PlayerTag p, PropertyTag prop)
+        public static bool Buy(int playerId, PropertyTag prop)
         {
-            if (!CanBuy(p, prop)) return false;
-            money[p.playerId] -= prop.price;
-            p.money = money[p.playerId];
-            owner[prop.propertyId] = p.playerId;
-            SimpleUI.Log($"{p.playerName} bought {prop.displayName} for ${prop.price}.");
-            SimpleUI.RefreshMoney(p.playerId, money[p.playerId]);
+            if (GetOwner(prop.propertyId) != -1) return false;
+            int m = GetMoney(playerId);
+            if (m < prop.price) return false;
+
+            money[playerId] = m - prop.price;
+            owner[prop.propertyId] = playerId;
+
+            GameEvents.RaisePropertyBought(new PropertyBought{
+                playerId = playerId, propertyId = prop.propertyId, propertyName = prop.displayName, price = prop.price
+            });
+            GameEvents.RaiseMoneyChanged(new MoneyChanged{ playerId = playerId, money = money[playerId] });
             return true;
         }
 
-        public static void PayRent(PlayerTag payer, PropertyTag prop)
+        public static void PayRent(int payerId, int ownerId, PropertyTag prop)
         {
-            int o = GetOwner(prop.propertyId);
-            if (o == -1 || o == payer.playerId) return;
+            if (ownerId == -1 || ownerId == payerId) return;
+            int rent = prop.baseRent <= 0 ? 1 : prop.baseRent;
 
-            int rent = Mathf.Max(1, prop.baseRent);
-            money[payer.playerId] -= rent;
-            if (!money.ContainsKey(o)) money[o] = 0;
-            money[o] += rent;
+            money[payerId]  = GetMoney(payerId)  - rent;
+            money[ownerId]  = GetMoney(ownerId) + rent;
 
-            payer.money = money[payer.playerId];
-            SimpleUI.Log($"{payer.playerName} paid ${rent} rent to P{o} for {prop.displayName}.");
-            SimpleUI.RefreshMoney(payer.playerId, money[payer.playerId]);
-            SimpleUI.RefreshMoney(o, money[o]);
+            GameEvents.RaiseRentPaid(new RentPaid{
+                payerId = payerId, ownerId = ownerId, propertyId = prop.propertyId, propertyName = prop.displayName, amount = rent
+            });
+            GameEvents.RaiseMoneyChanged(new MoneyChanged{ playerId = payerId, money = money[payerId] });
+            GameEvents.RaiseMoneyChanged(new MoneyChanged{ playerId = ownerId, money = money[ownerId] });
         }
     }
 }

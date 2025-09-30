@@ -7,11 +7,11 @@ namespace ARMonopoly.Simple
 {
     public class SimpleUI : MonoBehaviour
     {
-        public static SimpleUI Instance;
-
         [Header("Refs")]
         public TMP_Text distancesText;
         public TMP_Text logText;
+
+        [Header("Buy Panel")]
         public GameObject buyPanel;
         public TMP_Text buyLabel;
         public Button buyButton;
@@ -19,47 +19,68 @@ namespace ARMonopoly.Simple
         [Header("Money (optional)")]
         public TMP_Text[] moneyTexts; // index by playerId
 
-        private void Awake()
+        // state for buy action
+        private int pendingPlayerId = -1;
+        private string pendingPropId = null;
+
+        private void OnEnable()
         {
-            Instance = this;
-            HideBuy();
+            GameEvents.DistancesUpdated += SetDistances;
+            GameEvents.BuyPrompt        += OnBuyPrompt;
+            GameEvents.PropertyBought   += OnPropertyBought;
+            GameEvents.RentPaid         += OnRentPaid;
+            GameEvents.MoneyChanged     += OnMoneyChanged;
+        }
+        private void OnDisable()
+        {
+            GameEvents.DistancesUpdated -= SetDistances;
+            GameEvents.BuyPrompt        -= OnBuyPrompt;
+            GameEvents.PropertyBought   -= OnPropertyBought;
+            GameEvents.RentPaid         -= OnRentPaid;
+            GameEvents.MoneyChanged     -= OnMoneyChanged;
         }
 
-        public static void UpdateDistances(string s) => Instance?.SetDistances(s);
-        public static void Log(string s) => Instance?.AppendLog(s);
-        public static void ShowBuy(PropertyTag prop, PlayerTag player, System.Action onBuy)
+        private void Awake() => HideBuy();
+
+        private void SetDistances(string s) { if (distancesText) distancesText.text = s; }
+
+        private void OnBuyPrompt(BuyPrompt e)
         {
-            if (Instance == null) return;
-            Instance.buyPanel.SetActive(true);
-            Instance.buyLabel.text = $"{player.playerName}: Buy {prop.displayName} for ${prop.price}?";
-            Instance.buyButton.onClick.RemoveAllListeners();
-            Instance.buyButton.onClick.AddListener(() =>
+            pendingPlayerId = e.playerId;
+            pendingPropId   = e.propertyId;
+
+            if (buyPanel) buyPanel.SetActive(true);
+            if (buyLabel) buyLabel.text = $"P{e.playerId}: Buy {e.propertyName} for ${e.price}?";
+
+            buyButton.onClick.RemoveAllListeners();
+            buyButton.onClick.AddListener(() =>
             {
-                onBuy?.Invoke();
-                Instance.HideBuy();
+                GameEvents.RaiseBuyRequested(new BuyRequest{ playerId = pendingPlayerId, propertyId = pendingPropId });
+                HideBuy();
             });
         }
-        public static void RefreshMoney(int playerId, int money)
+
+        private void OnPropertyBought(PropertyBought e)
         {
-            if (Instance == null) return;
-            if (playerId >= 0 && playerId < Instance.moneyTexts.Length && Instance.moneyTexts[playerId] != null)
-                Instance.moneyTexts[playerId].text = $"P{playerId}: ${money}";
+            AppendLog($"P{e.playerId} bought {e.propertyName} for ${e.price}.");
         }
 
-        private void SetDistances(string s)
+        private void OnRentPaid(RentPaid e)
         {
-            if (distancesText) distancesText.text = s;
+            AppendLog($"P{e.payerId} paid ${e.amount} rent to P{e.ownerId} for {e.propertyName}.");
         }
 
+        private void OnMoneyChanged(MoneyChanged e)
+        {
+            if (moneyTexts != null && e.playerId >= 0 && e.playerId < moneyTexts.Length && moneyTexts[e.playerId] != null)
+                moneyTexts[e.playerId].text = $"P{e.playerId}: ${e.money}";
+        }
+
+        private void HideBuy() { if (buyPanel) buyPanel.SetActive(false); }
         private void AppendLog(string s)
         {
             if (!logText) return;
             logText.text = s + "\n" + logText.text;
-        }
-
-        private void HideBuy()
-        {
-            if (buyPanel) buyPanel.SetActive(false);
         }
     }
 }

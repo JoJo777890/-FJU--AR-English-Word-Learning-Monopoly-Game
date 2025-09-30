@@ -7,13 +7,8 @@ namespace ARMonopoly.Simple
     {
         private void Start()
         {
-            // Seed money labels for any PlayerTag in scene
-            var players = FindObjectsOfType<PlayerTag>();
-            foreach (var p in players)
-            {
+            foreach (var p in GameObject.FindObjectsOfType<PlayerTag>())
                 SimpleGame.RegisterPlayer(p);
-                SimpleUI.RefreshMoney(p.playerId, p.money);
-            }
         }
     }
 }
