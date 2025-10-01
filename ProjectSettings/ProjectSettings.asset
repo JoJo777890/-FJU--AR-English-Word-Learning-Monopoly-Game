@@ -13,8 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: FJU
-  productName: LEARN-OPOLY_v0_7_3 - Player Interaction with Landmark Location_(A,
-    B, C, D) - Location Pop-up Effect
+  productName: LEARN-OPOLY_v0_8 _ Small-Scale _ Buy_Pay-Rent_Location
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -142,7 +141,7 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   visionOSBundleVersion: 1.0
   tvOSBundleVersion: 1.0
-  bundleVersion: 0.7.3
+  bundleVersion: 0.8
   preloadedAssets: []
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -165,7 +164,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.FJU.LEARNOPOLY_v0_7_3PlayerInteractionwithLandmarkLocation_ABCDLocationPopupEffect
+    Android: com.FJU.LEARNOPOLY_v0_8_SmallScale_Buy_PayRent_Location
     Lumin: com.PTCInc.VuforiaEngine
     Standalone: com.PTCInc.VuforiaEngine
     iPhone: com.vuforia.engine.VuforiaEngine
