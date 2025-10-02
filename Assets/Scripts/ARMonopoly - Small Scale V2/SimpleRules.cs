@@ -26,7 +26,10 @@ namespace ARMonopoly.Simple
             {
                 // unowned -> prompt UI
                 GameEvents.RaiseBuyPrompt(new BuyPrompt{
-                    playerId = e.playerId, propertyId = e.propertyId, propertyName = e.propertyName, price = tag.price
+                    playerId = e.playerId, 
+                    propertyId = e.propertyId, 
+                    propertyName = e.propertyName, 
+                    price = tag.price
                 });
             }
             else

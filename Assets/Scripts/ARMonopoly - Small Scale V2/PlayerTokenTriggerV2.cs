@@ -26,7 +26,8 @@ namespace ARMonopoly.Simple
         {
             playerObserver = GetComponent<ObserverBehaviour>();
             playerTag      = GetComponent<PlayerTag>();
-            if (playerTag != null) SimpleGame.RegisterPlayer(playerTag);
+            if (playerTag != null) 
+                SimpleGame.RegisterPlayer(playerTag);
 
             foreach (var prop in propertyTargets)
             {
@@ -42,8 +43,10 @@ namespace ARMonopoly.Simple
 
         void Update()
         {
-            if (playerObserver == null || playerObserver.TargetStatus.Status < Status.TRACKED) return;
-            if (playerTag == null) return;
+            if (playerObserver == null || playerObserver.TargetStatus.Status < Status.TRACKED) 
+                return;
+            if (playerTag == null) 
+                return;
 
             string distancesUI = "";
 
@@ -58,14 +61,21 @@ namespace ARMonopoly.Simple
                 // scale only content children
                 foreach (Transform child in prop.transform)
                 {
-                    if (!child.name.EndsWith(contentSuffix)) continue;
+                    if (!child.name.EndsWith(contentSuffix)) 
+                        continue;
+                    
                     var orig = baseScale.TryGetValue(child, out var s) ? s : child.localScale;
                     child.localScale = close ? orig * scaleUpFactor : orig;
-                    if (!child.gameObject.activeSelf) child.gameObject.SetActive(true);
+                    
+                    if (!child.gameObject.activeSelf) 
+                        child.gameObject.SetActive(true);
                 }
 
                 // dwell (stable landing)
-                if (close) dwell[prop] += Time.deltaTime; else dwell[prop] = 0f;
+                if (close) 
+                    dwell[prop] += Time.deltaTime; 
+                else 
+                    dwell[prop] = 0f;
 
                 if (close && dwell[prop] >= dwellSeconds)
                 {

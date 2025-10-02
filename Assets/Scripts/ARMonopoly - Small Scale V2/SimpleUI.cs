@@ -42,20 +42,30 @@ namespace ARMonopoly.Simple
 
         private void Awake() => HideBuy();
 
-        private void SetDistances(string s) { if (distancesText) distancesText.text = s; }
+        private void SetDistances(string s) 
+        {
+            if (distancesText) 
+                distancesText.text = s;
+        }
 
         private void OnBuyPrompt(BuyPrompt e)
         {
             pendingPlayerId = e.playerId;
             pendingPropId   = e.propertyId;
 
-            if (buyPanel) buyPanel.SetActive(true);
-            if (buyLabel) buyLabel.text = $"P{e.playerId}: Buy {e.propertyName} for ${e.price}?";
+            if (buyPanel) 
+                buyPanel.SetActive(true);
+            if (buyLabel) 
+                buyLabel.text = $"P{e.playerId}: Buy {e.propertyName} for ${e.price}?";
 
             buyButton.onClick.RemoveAllListeners();
             buyButton.onClick.AddListener(() =>
             {
-                GameEvents.RaiseBuyRequested(new BuyRequest{ playerId = pendingPlayerId, propertyId = pendingPropId });
+                GameEvents.RaiseBuyRequested(new BuyRequest
+                {
+                    playerId = pendingPlayerId, 
+                    propertyId = pendingPropId
+                });
                 HideBuy();
             });
         }
@@ -76,7 +86,11 @@ namespace ARMonopoly.Simple
                 moneyTexts[e.playerId].text = $"P{e.playerId}: ${e.money}";
         }
 
-        private void HideBuy() { if (buyPanel) buyPanel.SetActive(false); }
+        private void HideBuy() 
+        {
+            if (buyPanel) 
+                buyPanel.SetActive(false);
+        }
         private void AppendLog(string s)
         {
             if (!logText) return;
