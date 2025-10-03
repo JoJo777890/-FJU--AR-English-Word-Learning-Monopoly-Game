@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ARMonopoly_Medium_Scale
 {
-    [CreateAssetMenu(menuName="ARMonopoly/Game Config")]
+    [CreateAssetMenu(menuName="ARMonopolyV2-MediumScale/Game Config")]
     public class GameConfig : ScriptableObject
     {
         [Header("Rules")]

@@ -29,7 +29,7 @@ namespace ARMonopoly_Medium_Scale
         public int intParam;    // e.g., amount or steps
     }
 
-    [CreateAssetMenu(menuName="ARMonopoly/Card Deck")]
+    [CreateAssetMenu(menuName="ARMonopolyV2-MediumScale/Card Deck")]
     public class CardDeck : ScriptableObject
     {
         public DeckType type;

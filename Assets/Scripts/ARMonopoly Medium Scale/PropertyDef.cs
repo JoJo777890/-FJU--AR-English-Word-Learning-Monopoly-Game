@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ARMonopoly_Medium_Scale
 {
-    [CreateAssetMenu(menuName="ARMonopoly/Property")]
+    [CreateAssetMenu(menuName="ARMonopolyV2-MediumScale/Property")]
     public class PropertyDef : ScriptableObject
     {
         public string id;               // stable key (e.g., "TOKYO_TOWER")

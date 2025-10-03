@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ARMonopoly_Medium_Scale
 {
-    [CreateAssetMenu(menuName="ARMonopoly/Property DB")]
+    [CreateAssetMenu(menuName="ARMonopolyV2-MediumScale/Property DB")]
     public class PropertyDatabase : ScriptableObject
     {
         public List<PropertyDef> properties = new();
