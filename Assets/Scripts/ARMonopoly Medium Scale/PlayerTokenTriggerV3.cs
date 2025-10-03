@@ -39,26 +39,34 @@ namespace ARMonopoly_Medium_Scale
             // cache scales
             foreach (var prop in propertyTargets)
             {
-                if (!prop) continue;
+                if (!prop) 
+                    continue;
                 foreach (Transform c in prop.transform)
-                    if (c.name.EndsWith(contentSuffix) && !_base.ContainsKey(c)) _base[c] = c.localScale;
+                    if (c.name.EndsWith(contentSuffix) && !_base.ContainsKey(c))
+                    {
+                        _base[c] = c.localScale;
+                    }
                 _dwell[prop] = 0f;
             }
 
             // register player money in EconomyService
-            if (_app) _app.GetService<EconomyService>()?.RegisterPlayer(_playerTag.playerId, _playerTag.money);
+            if (_app) 
+                _app.GetService<EconomyService>()?.RegisterPlayer(_playerTag.playerId, _playerTag.money);
         }
 
         void Update()
         {
-            if (!_playerObs || _playerObs.TargetStatus.Status < Status.TRACKED) return;
-            if (_playerTag == null) return;
+            if (!_playerObs || _playerObs.TargetStatus.Status < Status.TRACKED) 
+                return;
+            if (_playerTag == null) 
+                return;
 
             string debug = "";
 
             foreach (var prop in propertyTargets)
             {
-                if (!prop || prop.TargetStatus.Status < Status.TRACKED) continue;
+                if (!prop || prop.TargetStatus.Status < Status.TRACKED) 
+                    continue;
 
                 float d = Vector3.Distance(transform.position, prop.transform.position);
                 bool close = d < triggerDistance;
@@ -66,13 +74,24 @@ namespace ARMonopoly_Medium_Scale
 
                 foreach (Transform c in prop.transform)
                 {
-                    if (!c.name.EndsWith(contentSuffix)) continue;
+                    if (!c.name.EndsWith(contentSuffix)) 
+                        continue;
                     var orig = _base.TryGetValue(c, out var s) ? s : c.localScale;
                     c.localScale = close ? orig * scaleUpFactor : orig;
-                    if (!c.gameObject.activeSelf) c.gameObject.SetActive(true);
+                    if (!c.gameObject.activeSelf)
+                    {
+                        c.gameObject.SetActive(true);
+                    }
                 }
 
-                if (close) _dwell[prop] += Time.deltaTime; else _dwell[prop] = 0f;
+                if (close)
+                {
+                    _dwell[prop] += Time.deltaTime;
+                }
+                else
+                {
+                    _dwell[prop] = 0f;
+                }
 
                 if (close && _dwell[prop] >= dwellSeconds)
                 {
@@ -87,7 +106,10 @@ namespace ARMonopoly_Medium_Scale
                         });
                     }
                 }
-                else if (!close && _dwell[prop] < 0f) _dwell[prop] = 0f;
+                else if (!close && _dwell[prop] < 0f)
+                {
+                    _dwell[prop] = 0f;
+                }
             }
 
             GameEvents.RaiseDistancesUpdated(debug);

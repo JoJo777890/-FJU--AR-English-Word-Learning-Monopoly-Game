@@ -32,11 +32,17 @@ namespace ARMonopoly_Medium_Scale
 
         public T GetService<T>() where T : class
         {
-            if (typeof(T) == typeof(EconomyService))  return _economy as T;
-            if (typeof(T) == typeof(OwnershipService)) return _ownership as T;
+            if (typeof(T) == typeof(EconomyService))  
+                return _economy as T;
+            if (typeof(T) == typeof(OwnershipService)) 
+                return _ownership as T;
+            
             return null;
         }
 
-        public void SetCurrentPlayer(int pid) => CurrentPlayerId = pid;
+        public void SetCurrentPlayer(int pid)
+        {
+            CurrentPlayerId = pid;
+        }
     }
 }

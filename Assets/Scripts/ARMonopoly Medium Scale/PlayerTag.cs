@@ -8,6 +8,9 @@ namespace ARMonopoly_Medium_Scale
         public int startingMoney = 1500;
         [HideInInspector] public int money;
 
-        private void Awake() { money = startingMoney; }
+        private void Awake() 
+        {
+            money = startingMoney;
+        }
     }
 }

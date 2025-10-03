@@ -7,7 +7,8 @@ namespace ARMonopoly_Medium_Scale
         private readonly Dictionary<int,int> _money = new();
 
         public void RegisterPlayer(int pid, int startMoney) {
-            if (!_money.ContainsKey(pid)) _money[pid] = startMoney;
+            if (!_money.ContainsKey(pid)) 
+                _money[pid] = startMoney;
             GameEvents.RaiseMoneyChanged(new MoneyChanged{ playerId = pid, money = _money[pid] });
         }
 
@@ -19,9 +20,19 @@ namespace ARMonopoly_Medium_Scale
         }
         public bool Debit(int pid, int amount) {
             int m = GetMoney(pid);
-            if (m < amount) { _money[pid] = m - amount; } // allow negative for simplicity
-            else _money[pid] = m - amount;
-            GameEvents.RaiseMoneyChanged(new MoneyChanged{ playerId = pid, money = _money[pid] });
+            if (m < amount)
+            {
+                _money[pid] = m - amount;
+            } // allow negative for simplicity
+            else
+            {
+                _money[pid] = m - amount;
+            }
+            GameEvents.RaiseMoneyChanged(new MoneyChanged
+            {
+                playerId = pid, 
+                money = _money[pid]
+            });
             return true;
         }
         public void Transfer(int from, int to, int amount) {

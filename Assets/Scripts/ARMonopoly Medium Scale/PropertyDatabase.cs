@@ -11,7 +11,11 @@ namespace ARMonopoly_Medium_Scale
 
         void OnEnable() {
             _map = new();
-            foreach (var p in properties) if (p && !string.IsNullOrEmpty(p.id)) _map[p.id] = p;
+            foreach (var p in properties)
+            {
+                if (p && !string.IsNullOrEmpty(p.id))
+                    _map[p.id] = p;
+            }
         }
         public PropertyDef Get(string id) => (_map != null && _map.TryGetValue(id, out var d)) ? d : null;
     }

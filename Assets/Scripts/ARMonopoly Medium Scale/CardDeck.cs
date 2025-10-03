@@ -2,9 +2,20 @@ using UnityEngine;
 
 namespace ARMonopoly_Medium_Scale
 {
-    public enum DeckType { Chance, Community }
+    public enum DeckType 
+    {
+        Chance, 
+        Community
+    }
+    
     public enum CardEffectType {
-        AdvanceToId, GoToJail, GetOutOfJail, ReceiveFromBank, PayBank, AdvanceRelative, Repairs
+        AdvanceToId, 
+        GoToJail, 
+        GetOutOfJail, 
+        ReceiveFromBank, 
+        PayBank, 
+        AdvanceRelative, 
+        Repairs
     }
 
     [System.Serializable]

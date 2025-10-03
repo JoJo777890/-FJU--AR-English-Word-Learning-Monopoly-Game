@@ -17,7 +17,10 @@ namespace ARMonopoly_Medium_Scale
             _jailedTurns = new int[4];
         }
 
-        private void Start() { StartTurn(); }
+        private void Start()
+        {
+            StartTurn();
+        }
 
         public void StartTurn()
         {
@@ -54,7 +57,11 @@ namespace ARMonopoly_Medium_Scale
             EndTurn();
         }
 
-        public void SendToJail(int pid) { _jailedTurns[pid] = _cfg.maxJailTurns; GameEvents.RaiseSentToJail(pid); }
+        public void SendToJail(int pid)
+        {
+            _jailedTurns[pid] = _cfg.maxJailTurns; 
+            GameEvents.RaiseSentToJail(pid);
+        }
 
         public void EndTurn()
         {

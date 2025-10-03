@@ -9,18 +9,34 @@ namespace ARMonopoly_Medium_Scale
 
         private System.Random rng;
 
-        private void Awake() { rng = new System.Random(); }
+        private void Awake()
+        {
+            rng = new System.Random();
+        }
 
-        private void OnEnable() { GameEvents.DrawCardRequested += OnDraw; }
-        private void OnDisable(){ GameEvents.DrawCardRequested -= OnDraw; }
+        private void OnEnable()
+        {
+            GameEvents.DrawCardRequested += OnDraw;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.DrawCardRequested -= OnDraw;
+        }
 
         private void OnDraw(DeckType t)
         {
             var deck = t == DeckType.Chance ? chanceDeck : communityDeck;
-            if (deck == null || deck.cards == null || deck.cards.Length == 0) return;
+            if (deck == null || deck.cards == null || deck.cards.Length == 0) 
+                return;
 
             var card = deck.cards[rng.Next(deck.cards.Length)];
-            GameEvents.RaiseCardDrawn(new CardDrawn{ deck=t, title=card.title, body=card.body });
+            GameEvents.RaiseCardDrawn(new CardDrawn
+            {
+                deck=t, 
+                title=card.title, 
+                body=card.body
+            });
 
             // Apply effect (minimal set)
             switch (card.effectType)

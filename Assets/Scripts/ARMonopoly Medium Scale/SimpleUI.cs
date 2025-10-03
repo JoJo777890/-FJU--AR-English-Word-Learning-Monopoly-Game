@@ -49,32 +49,61 @@ namespace ARMonopoly_Medium_Scale
             GameEvents.CardDrawn     -= OnCardDrawn;
         }
 
-        void OnTurn(int pid) { if (turnText) turnText.text = $"Turn: P{pid}"; }
-        void OnDice(int pid,int d1,int d2) { if (diceText) diceText.text = $"Dice: {d1}+{d2}"; }
+        void OnTurn(int pid)
+        {
+            if (turnText)
+            {
+                turnText.text = $"Turn: P{pid}";
+            }
+        }
+
+        void OnDice(int pid, int d1, int d2)
+        {
+            if (diceText)
+            {
+                diceText.text = $"Dice: {d1}+{d2}";
+            }
+        }
 
         void OnMoney(MoneyChanged e)
         {
             if (moneyTexts != null && e.playerId >= 0 && e.playerId < moneyTexts.Length && moneyTexts[e.playerId])
+            {
                 moneyTexts[e.playerId].text = $"P{e.playerId}: ${e.money}";
+            }
         }
 
         void OnBuyPrompt(BuyPrompt e)
         {
             pendingPlayerId = e.playerId; pendingPropId = e.propertyId;
-            if (buyPanel) buyPanel.SetActive(true);
-            if (buyLabel) buyLabel.text = $"P{e.playerId}: Buy {e.propertyName} for ${e.price}?";
+            if (buyPanel)
+            {
+                buyPanel.SetActive(true);
+            }
+
+            if (buyLabel)
+            {
+                buyLabel.text = $"P{e.playerId}: Buy {e.propertyName} for ${e.price}?";
+            }
             buyBtn.onClick.RemoveAllListeners();
             buyBtn.onClick.AddListener(() => {
-                GameEvents.RaiseBuyRequested(new BuyRequest{ playerId=pendingPlayerId, propertyId=pendingPropId });
+                GameEvents.RaiseBuyRequested(new BuyRequest
+                {
+                    playerId=pendingPlayerId, 
+                    propertyId=pendingPropId
+                });
                 HideBuy();
             });
         }
 
         void OnCardDrawn(CardDrawn e)
         {
-            if (cardPanel) cardPanel.SetActive(true);
-            if (cardTitle) cardTitle.text = $"{e.deck}: {e.title}";
-            if (cardBody)  cardBody.text  = e.body;
+            if (cardPanel) 
+                cardPanel.SetActive(true);
+            if (cardTitle) 
+                cardTitle.text = $"{e.deck}: {e.title}";
+            if (cardBody)  
+                cardBody.text  = e.body;
             if (cardOkBtn)
             {
                 cardOkBtn.onClick.RemoveAllListeners();
@@ -82,8 +111,22 @@ namespace ARMonopoly_Medium_Scale
             }
         }
 
-        void HideBuy() { if (buyPanel) buyPanel.SetActive(false); }
-        void HideCard(){ if (cardPanel) cardPanel.SetActive(false); }
-        void Log(string s) { if (logText) logText.text = s + "\n" + logText.text; }
+        void HideBuy()
+        {
+            if (buyPanel) 
+                buyPanel.SetActive(false);
+        }
+
+        void HideCard()
+        {
+            if (cardPanel) 
+                cardPanel.SetActive(false);
+        }
+
+        void Log(string s)
+        {
+            if (logText) 
+                logText.text = s + "\n" + logText.text;
+        }
     }
 }

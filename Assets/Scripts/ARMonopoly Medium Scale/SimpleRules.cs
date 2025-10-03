@@ -31,13 +31,17 @@ namespace ARMonopoly_Medium_Scale
         private void OnPropertyLanded(PropertyLanded e)
         {
             var tag = FindTagById(e.propertyId);
-            if (!tag) return;
+            if (!tag) 
+                return;
 
             int owner = _own.GetOwner(tag.Id);
             if (owner == -1)
             {
                 GameEvents.RaiseBuyPrompt(new BuyPrompt {
-                    playerId = e.playerId, propertyId = tag.Id, propertyName = tag.DisplayName, price = tag.Price
+                    playerId = e.playerId, 
+                    propertyId = tag.Id, 
+                    propertyName = tag.DisplayName, 
+                    price = tag.Price
                 });
             }
             else if (owner != e.playerId)
@@ -45,7 +49,11 @@ namespace ARMonopoly_Medium_Scale
                 int rent = tag.BaseRent; // tiers/houses can be added later
                 _eco.Transfer(e.playerId, owner, rent);
                 GameEvents.RaiseRentPaid(new RentPaid{
-                    payerId = e.playerId, ownerId = owner, propertyId = tag.Id, propertyName = tag.DisplayName, amount = rent
+                    payerId = e.playerId, 
+                    ownerId = owner, 
+                    propertyId = tag.Id, 
+                    propertyName = tag.DisplayName, 
+                    amount = rent
                 });
             }
         }
@@ -53,9 +61,11 @@ namespace ARMonopoly_Medium_Scale
         private void OnBuyRequested(BuyRequest req)
         {
             var tag = FindTagById(req.propertyId);
-            if (!tag) return;
+            if (!tag) 
+                return;
             int pid = req.playerId;
-            if (_own.GetOwner(tag.Id) != -1) return;
+            if (_own.GetOwner(tag.Id) != -1) 
+                return;
             int price = tag.Price;
 
             if (_eco.GetMoney(pid) >= price)
@@ -63,7 +73,10 @@ namespace ARMonopoly_Medium_Scale
                 _eco.Debit(pid, price);
                 _own.SetOwner(tag.Id, pid);
                 GameEvents.RaisePropertyBought(new PropertyBought{
-                    playerId=pid, propertyId=tag.Id, propertyName=tag.DisplayName, price=price
+                    playerId=pid, 
+                    propertyId=tag.Id, 
+                    propertyName=tag.DisplayName, 
+                    price=price
                 });
             }
         }
@@ -75,7 +88,9 @@ namespace ARMonopoly_Medium_Scale
 
         private PropertyTag FindTagById(string id)
         {
-            foreach (var t in FindObjectsOfType<PropertyTag>()) if (t.Id == id) return t;
+            foreach (var t in FindObjectsOfType<PropertyTag>()) 
+                if (t.Id == id) 
+                    return t;
             return null;
         }
     }
