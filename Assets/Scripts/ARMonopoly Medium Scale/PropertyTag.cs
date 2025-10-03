@@ -1,0 +1,12 @@
+using UnityEngine;
+
+namespace ARMonopoly_Medium_Scale 
+{
+    public class PropertyTag : MonoBehaviour {
+        public PropertyDef def;
+        public string Id => def ? def.id : name;
+        public string DisplayName => def ? def.displayName : name;
+        public int Price => def ? def.price : 0;
+        public int BaseRent => (def && def.rentTiers.Length>0) ? def.rentTiers[0] : 1;
+    }
+}
