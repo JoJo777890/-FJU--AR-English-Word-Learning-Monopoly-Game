@@ -20,7 +20,8 @@ namespace ARMonopoly_Medium_Scale
 
         private readonly Dictionary<Transform, Vector3> _base = new();
         private readonly Dictionary<ObserverBehaviour, float> _dwell = new();
-
+        
+        
         void Start()
         {
             _playerTag = GetComponent<PlayerTag>();
@@ -95,16 +96,32 @@ namespace ARMonopoly_Medium_Scale
 
                 if (close && _dwell[prop] >= dwellSeconds)
                 {
-                    _dwell[prop] = -999f;
+                    _dwell[prop] = -999f; // prevent repeat until we leave
+                    
+                    //-- Debug Below --
                     var tag = prop.GetComponent<PropertyTag>();
-                    if (tag)
+                    if (tag == null)
                     {
-                        GameEvents.RaisePropertyLanded(new PropertyLanded{
-                            playerId = _playerTag.playerId,
-                            propertyId = tag.Id,
-                            propertyName = tag.DisplayName
-                        });
+                        Debug.LogError($"[Trigger] PropertyLanded but PropertyTag missing on target '{prop.TargetName}'. Add PropertyTag.");
                     }
+                    else
+                    {
+                        var id = tag.Id; // def.id or fallback gameObject.name
+                        if (string.IsNullOrEmpty(id))
+                        {
+                            Debug.LogError($"[Trigger] PropertyTag.Id is empty on '{prop.TargetName}'. Set PropertyDef.id or rename object.");
+                        }
+                        else
+                        {
+                            Debug.Log($"[Trigger] Landed: P{_playerTag.playerId} on {id} ({tag.DisplayName})");
+                            GameEvents.RaisePropertyLanded(new PropertyLanded{
+                                playerId    = _playerTag.playerId,
+                                propertyId  = id,
+                                propertyName= tag.DisplayName
+                            });
+                        }
+                    }
+                    //-- Debug Above --
                 }
                 else if (!close && _dwell[prop] < 0f)
                 {

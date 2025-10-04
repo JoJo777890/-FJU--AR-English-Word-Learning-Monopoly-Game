@@ -75,6 +75,8 @@ namespace ARMonopoly_Medium_Scale
 
         void OnBuyPrompt(BuyPrompt e)
         {
+            Debug.Log($"[UI] Showing BuyPanel for P{e.playerId} {e.propertyName} ${e.price}"); // --Debug
+            
             pendingPlayerId = e.playerId; pendingPropId = e.propertyId;
             if (buyPanel)
             {

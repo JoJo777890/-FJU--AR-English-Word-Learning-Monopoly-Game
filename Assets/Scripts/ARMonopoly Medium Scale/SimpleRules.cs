@@ -1,3 +1,4 @@
+// SimpleRules.cs
 using UnityEngine;
 
 namespace ARMonopoly_Medium_Scale
@@ -8,89 +9,96 @@ namespace ARMonopoly_Medium_Scale
         private EconomyService _eco;
         private OwnershipService _own;
 
-        private void Awake()
-        {
-            _app = FindObjectOfType<AppGame>();
-            _eco = _app.GetService<EconomyService>();
-            _own = _app.GetService<OwnershipService>();
-        }
-
         private void OnEnable()
         {
             GameEvents.PropertyLanded += OnPropertyLanded;
             GameEvents.BuyRequested   += OnBuyRequested;
-            GameEvents.SentToJail     += OnSentToJail;
+            EnsureServices();
         }
         private void OnDisable()
         {
             GameEvents.PropertyLanded -= OnPropertyLanded;
             GameEvents.BuyRequested   -= OnBuyRequested;
-            GameEvents.SentToJail     -= OnSentToJail;
+        }
+
+        private void EnsureServices()
+        {
+            if (_app == null) _app = FindObjectOfType<AppGame>();
+            if (_app != null)
+            {
+                _eco = _app.GetService<EconomyService>();
+                _own = _app.GetService<OwnershipService>();
+            }
+        }
+
+        private bool ServicesReady()
+        {
+            EnsureServices();
+            if (_app == null || _eco == null || _own == null)
+            {
+                Debug.LogError($"[SimpleRules] Services not ready. App={_app!=null}, Eco={_eco!=null}, Own={_own!=null}");
+                return false;
+            }
+            return true;
         }
 
         private void OnPropertyLanded(PropertyLanded e)
         {
-            var tag = FindTagById(e.propertyId);
-            if (!tag) 
+            if (!ServicesReady()) return;
+
+            if (string.IsNullOrEmpty(e.propertyId))
+            {
+                Debug.LogError("[SimpleRules] propertyId null/empty.");
                 return;
+            }
+
+            var tag = FindPropertyById(e.propertyId);
+            if (tag == null)
+            {
+                Debug.LogError($"[SimpleRules] PropertyTag not found for id='{e.propertyId}'.");
+                return;
+            }
 
             int owner = _own.GetOwner(tag.Id);
             if (owner == -1)
             {
-                GameEvents.RaiseBuyPrompt(new BuyPrompt {
-                    playerId = e.playerId, 
-                    propertyId = tag.Id, 
-                    propertyName = tag.DisplayName, 
-                    price = tag.Price
+                GameEvents.RaiseBuyPrompt(new BuyPrompt{
+                    playerId = e.playerId, propertyId = tag.Id, propertyName = tag.DisplayName, price = tag.Price
                 });
             }
             else if (owner != e.playerId)
             {
-                int rent = tag.BaseRent; // tiers/houses can be added later
+                int rent = Mathf.Max(1, tag.BaseRent);
                 _eco.Transfer(e.playerId, owner, rent);
                 GameEvents.RaiseRentPaid(new RentPaid{
-                    payerId = e.playerId, 
-                    ownerId = owner, 
-                    propertyId = tag.Id, 
-                    propertyName = tag.DisplayName, 
-                    amount = rent
+                    payerId=e.playerId, ownerId=owner, propertyId=tag.Id, propertyName=tag.DisplayName, amount=rent
                 });
             }
         }
 
         private void OnBuyRequested(BuyRequest req)
         {
-            var tag = FindTagById(req.propertyId);
-            if (!tag) 
-                return;
-            int pid = req.playerId;
-            if (_own.GetOwner(tag.Id) != -1) 
-                return;
-            int price = tag.Price;
+            if (!ServicesReady()) return;
 
-            if (_eco.GetMoney(pid) >= price)
+            var tag = FindPropertyById(req.propertyId);
+            if (tag == null) { Debug.LogError($"[SimpleRules] BuyRequested: missing tag '{req.propertyId}'."); return; }
+            if (_own.GetOwner(tag.Id) != -1) return;
+
+            int price = tag.Price;
+            if (_eco.GetMoney(req.playerId) >= price)
             {
-                _eco.Debit(pid, price);
-                _own.SetOwner(tag.Id, pid);
+                _eco.Debit(req.playerId, price);
+                _own.SetOwner(tag.Id, req.playerId);
                 GameEvents.RaisePropertyBought(new PropertyBought{
-                    playerId=pid, 
-                    propertyId=tag.Id, 
-                    propertyName=tag.DisplayName, 
-                    price=price
+                    playerId=req.playerId, propertyId=tag.Id, propertyName=tag.DisplayName, price=price
                 });
             }
         }
 
-        private void OnSentToJail(int pid)
+        private PropertyTag FindPropertyById(string id)
         {
-            // In an all-ImageTarget game, you can just show UI note "Move your token to Jail area".
-        }
-
-        private PropertyTag FindTagById(string id)
-        {
-            foreach (var t in FindObjectsOfType<PropertyTag>()) 
-                if (t.Id == id) 
-                    return t;
+            foreach (var t in FindObjectsOfType<PropertyTag>())
+                if (t.Id == id) return t;
             return null;
         }
     }
