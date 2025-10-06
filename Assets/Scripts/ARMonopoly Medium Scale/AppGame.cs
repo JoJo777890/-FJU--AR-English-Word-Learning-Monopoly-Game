@@ -26,7 +26,10 @@ namespace ARMonopoly_Medium_Scale
             foreach (var p in FindObjectsOfType<PlayerTag>())
             {
                 int start = (p.startingMoney > 0) ? p.startingMoney : gameConfig.defaultStartMoney;
-                _economy.RegisterPlayer(p.playerId, start);
+                _economy.RegisterPlayer(
+                    p.playerId, 
+                    start
+                    );
             }
         }
 

@@ -30,23 +30,23 @@ namespace ARMonopoly_Medium_Scale
 
         void OnEnable()
         {
-            GameEvents.TurnStarted   += OnTurn;
-            GameEvents.DiceRolled    += OnDice;
-            GameEvents.MoneyChanged  += OnMoney;
-            GameEvents.BuyPrompt     += OnBuyPrompt;
-            GameEvents.PropertyBought+= e => Log($"P{e.playerId} bought {e.propertyName} (${e.price}).");
-            GameEvents.RentPaid      += e => Log($"P{e.payerId} paid ${e.amount} to P{e.ownerId} ({e.propertyName}).");
+            GameEvents.TurnStarted      += OnTurn;
+            GameEvents.DiceRolled       += OnDice;
+            GameEvents.MoneyChanged     += OnMoney;
+            GameEvents.BuyPrompt        += OnBuyPrompt;
+            GameEvents.PropertyBought   += e => Log($"P{e.playerId} bought {e.propertyName} (${e.price}).");
+            GameEvents.RentPaid         += e => Log($"P{e.payerId} paid ${e.amount} to P{e.ownerId} ({e.propertyName}).");
             GameEvents.DistancesUpdated += s => { if (distancesText) distancesText.text = s; };
-            GameEvents.CardDrawn     += OnCardDrawn;
+            GameEvents.CardDrawn        += OnCardDrawn;
         }
         void OnDisable()
         {
-            GameEvents.TurnStarted   -= OnTurn;
-            GameEvents.DiceRolled    -= OnDice;
-            GameEvents.MoneyChanged  -= OnMoney;
-            GameEvents.BuyPrompt     -= OnBuyPrompt;
+            GameEvents.TurnStarted      -= OnTurn;
+            GameEvents.DiceRolled       -= OnDice;
+            GameEvents.MoneyChanged     -= OnMoney;
+            GameEvents.BuyPrompt        -= OnBuyPrompt;
             GameEvents.DistancesUpdated -= (s)=>{};
-            GameEvents.CardDrawn     -= OnCardDrawn;
+            GameEvents.CardDrawn        -= OnCardDrawn;
         }
 
         void OnTurn(int pid)
@@ -102,10 +102,13 @@ namespace ARMonopoly_Medium_Scale
         {
             if (cardPanel) 
                 cardPanel.SetActive(true);
+            
             if (cardTitle) 
                 cardTitle.text = $"{e.deck}: {e.title}";
+            
             if (cardBody)  
                 cardBody.text  = e.body;
+            
             if (cardOkBtn)
             {
                 cardOkBtn.onClick.RemoveAllListeners();

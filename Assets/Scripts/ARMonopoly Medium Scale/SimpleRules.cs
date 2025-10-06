@@ -23,7 +23,11 @@ namespace ARMonopoly_Medium_Scale
 
         private void EnsureServices()
         {
-            if (_app == null) _app = FindObjectOfType<AppGame>();
+            if (_app == null)
+            {
+                _app = FindObjectOfType<AppGame>();
+            }
+            
             if (_app != null)
             {
                 _eco = _app.GetService<EconomyService>();
@@ -62,35 +66,62 @@ namespace ARMonopoly_Medium_Scale
             int owner = _own.GetOwner(tag.Id);
             if (owner == -1)
             {
-                GameEvents.RaiseBuyPrompt(new BuyPrompt{
-                    playerId = e.playerId, propertyId = tag.Id, propertyName = tag.DisplayName, price = tag.Price
+                GameEvents.RaiseBuyPrompt(new BuyPrompt
+                {
+                    playerId = e.playerId, 
+                    propertyId = tag.Id, 
+                    propertyName = tag.DisplayName, 
+                    price = tag.Price
                 });
             }
             else if (owner != e.playerId)
             {
                 int rent = Mathf.Max(1, tag.BaseRent);
                 _eco.Transfer(e.playerId, owner, rent);
-                GameEvents.RaiseRentPaid(new RentPaid{
-                    payerId=e.playerId, ownerId=owner, propertyId=tag.Id, propertyName=tag.DisplayName, amount=rent
+                GameEvents.RaiseRentPaid(new RentPaid
+                {
+                    payerId=e.playerId, 
+                    ownerId=owner, 
+                    propertyId=tag.Id, 
+                    propertyName=tag.DisplayName, 
+                    amount=rent
                 });
             }
         }
 
         private void OnBuyRequested(BuyRequest req)
         {
-            if (!ServicesReady()) return;
+            if (!ServicesReady()) 
+                return;
 
             var tag = FindPropertyById(req.propertyId);
-            if (tag == null) { Debug.LogError($"[SimpleRules] BuyRequested: missing tag '{req.propertyId}'."); return; }
-            if (_own.GetOwner(tag.Id) != -1) return;
+            
+            if (tag == null)
+            {
+                Debug.LogError($"[SimpleRules] BuyRequested: missing tag '{req.propertyId}'."); 
+                return;
+            }
+            if (_own.GetOwner(tag.Id) != -1) 
+                return;
 
             int price = tag.Price;
             if (_eco.GetMoney(req.playerId) >= price)
             {
-                _eco.Debit(req.playerId, price);
-                _own.SetOwner(tag.Id, req.playerId);
-                GameEvents.RaisePropertyBought(new PropertyBought{
-                    playerId=req.playerId, propertyId=tag.Id, propertyName=tag.DisplayName, price=price
+                _eco.Debit(
+                    req.playerId, 
+                    price
+                    );
+                _own.SetOwner(
+                    tag.Id, 
+                    req.playerId
+                    );
+                
+                GameEvents.RaisePropertyBought(new PropertyBought
+                {
+                    playerId=req.playerId, 
+                    propertyId=tag.Id, 
+                    propertyName=tag.DisplayName, 
+                    price=price
                 });
             }
         }
@@ -98,7 +129,8 @@ namespace ARMonopoly_Medium_Scale
         private PropertyTag FindPropertyById(string id)
         {
             foreach (var t in FindObjectsOfType<PropertyTag>())
-                if (t.Id == id) return t;
+                if (t.Id == id) 
+                    return t;
             return null;
         }
     }
