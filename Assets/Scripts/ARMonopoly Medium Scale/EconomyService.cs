@@ -18,7 +18,10 @@ namespace ARMonopoly_Medium_Scale
             });
         }
 
-        public int GetMoney(int pid) => _money.TryGetValue(pid, out var m) ? m : 0;
+        public int GetMoney(int pid)
+        {
+            return _money.TryGetValue(pid, out var m) ? m : 0;
+        }
 
         public void Credit(int pid, int amount) 
         {
@@ -29,6 +32,7 @@ namespace ARMonopoly_Medium_Scale
                 money = _money[pid]
             });
         }
+        
         public bool Debit(int pid, int amount) 
         {
             int m = GetMoney(pid);
@@ -49,6 +53,7 @@ namespace ARMonopoly_Medium_Scale
             
             return true;
         }
+        
         public void Transfer(int from, int to, int amount) 
         {
             Debit(from, amount);
