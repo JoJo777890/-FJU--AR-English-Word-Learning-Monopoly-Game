@@ -70,7 +70,7 @@ namespace ARMonopoly_Medium_Scale.UI
         {
             if (moneyTexts != null && e.playerId >= 0 && e.playerId < moneyTexts.Length && moneyTexts[e.playerId])
             {
-                moneyTexts[e.playerId].text = $"P{e.playerId}: ${e.money}";
+                moneyTexts[e.playerId].text = $"Player {e.playerId+1} Money: ${e.money}";
             }
         }
 
