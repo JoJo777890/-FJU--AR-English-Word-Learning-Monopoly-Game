@@ -4,7 +4,7 @@ using Vuforia;
 
 namespace ARMonopoly_Medium_Scale
 {
-    public class PlayerTokenTrigger : MonoBehaviour
+    public class PlayerTokenTriggerV3 : MonoBehaviour
     {
         public List<ObserverBehaviour> propertyTargets;
 
