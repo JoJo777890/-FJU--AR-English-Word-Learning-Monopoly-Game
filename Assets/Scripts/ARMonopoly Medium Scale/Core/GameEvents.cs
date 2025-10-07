@@ -1,6 +1,7 @@
 using System;
+using ARMonopoly_Medium_Scale.Data;
 
-namespace ARMonopoly_Medium_Scale
+namespace ARMonopoly_Medium_Scale.Core
 {
     public static class GameEvents
     {

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale
+namespace ARMonopoly_Medium_Scale.Data
 {
     [CreateAssetMenu(menuName="ARMonopolyV2-MediumScale/Game Config")]
     public class GameConfig : ScriptableObject

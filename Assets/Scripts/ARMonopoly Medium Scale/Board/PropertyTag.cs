@@ -1,6 +1,7 @@
+using ARMonopoly_Medium_Scale.Data;
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale 
+namespace ARMonopoly_Medium_Scale.Board 
 {
     public class PropertyTag : MonoBehaviour {
         public PropertyDef def;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale
+namespace ARMonopoly_Medium_Scale.Data
 {
     public enum DeckType 
     {
