@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PropertyDef - Location_B
   m_EditorClassIdentifier: 
   id: LocationID_02
-  displayName: DisplayName_LocationB
+  displayName: LocationB
   price: 100
   rentTiers: 140000001e00000028000000
   isUtility: 0
