@@ -1,9 +1,9 @@
-using ARMonopoly_V3___Medium_Scale.Data;
-using ARMonopoly_V3___Medium_Scale.Players;
-using ARMonopoly_V3___Medium_Scale.Services;
+using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Data;
+using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Players;
+using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Services;
 using UnityEngine;
 
-namespace ARMonopoly_V3___Medium_Scale.Core
+namespace ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Core
 {
     public class AppGame : MonoBehaviour
     {

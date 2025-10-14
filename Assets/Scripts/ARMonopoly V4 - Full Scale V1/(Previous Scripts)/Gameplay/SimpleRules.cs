@@ -1,9 +1,9 @@
-using ARMonopoly_V3___Medium_Scale.Board;
-using ARMonopoly_V3___Medium_Scale.Core;
-using ARMonopoly_V3___Medium_Scale.Services;
+using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Board;
+using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Core;
+using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Services;
 using UnityEngine;
 
-namespace ARMonopoly_V3___Medium_Scale.Gameplay
+namespace ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Gameplay
 {
     public class SimpleRules : MonoBehaviour
     {
