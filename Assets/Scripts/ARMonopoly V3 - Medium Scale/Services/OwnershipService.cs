@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ARMonopoly_Medium_Scale.Services
+namespace ARMonopoly_V3___Medium_Scale.Services
 {
     public class OwnershipService
     {

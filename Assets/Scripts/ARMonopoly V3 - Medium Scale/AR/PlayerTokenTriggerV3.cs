@@ -1,12 +1,12 @@
 using System.Collections.Generic;
-using ARMonopoly_Medium_Scale.Board;
-using ARMonopoly_Medium_Scale.Core;
-using ARMonopoly_Medium_Scale.Players;
-using ARMonopoly_Medium_Scale.Services;
+using ARMonopoly_V3___Medium_Scale.Board;
+using ARMonopoly_V3___Medium_Scale.Core;
+using ARMonopoly_V3___Medium_Scale.Players;
+using ARMonopoly_V3___Medium_Scale.Services;
 using UnityEngine;
 using Vuforia;
 
-namespace ARMonopoly_Medium_Scale.AR
+namespace ARMonopoly_V3___Medium_Scale.AR
 {
     public class PlayerTokenTriggerV3 : MonoBehaviour
     {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using ARMonopoly_Medium_Scale.Core;
+using ARMonopoly_V3___Medium_Scale.Core;
 
-namespace ARMonopoly_Medium_Scale.Services
+namespace ARMonopoly_V3___Medium_Scale.Services
 {
     public class EconomyService
     {

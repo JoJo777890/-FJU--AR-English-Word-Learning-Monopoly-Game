@@ -1,7 +1,7 @@
-using ARMonopoly_Medium_Scale.Gameplay;
+using ARMonopoly_V3___Medium_Scale.Gameplay;
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale.UI
+namespace ARMonopoly_V3___Medium_Scale.UI
 {
     public class RollButton : MonoBehaviour
     {

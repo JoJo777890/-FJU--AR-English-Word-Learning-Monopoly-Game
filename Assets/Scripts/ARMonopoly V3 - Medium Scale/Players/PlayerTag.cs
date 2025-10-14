@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale.Players 
+namespace ARMonopoly_V3___Medium_Scale.Players 
 {
     public class PlayerTag : MonoBehaviour {
         public int playerId = 0;

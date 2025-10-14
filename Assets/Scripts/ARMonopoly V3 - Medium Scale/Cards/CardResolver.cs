@@ -1,9 +1,9 @@
-using ARMonopoly_Medium_Scale.Core;
-using ARMonopoly_Medium_Scale.Data;
-using ARMonopoly_Medium_Scale.Services;
+using ARMonopoly_V3___Medium_Scale.Core;
+using ARMonopoly_V3___Medium_Scale.Data;
+using ARMonopoly_V3___Medium_Scale.Services;
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale.Cards
+namespace ARMonopoly_V3___Medium_Scale.Cards
 {
     public class CardResolver : MonoBehaviour
     {

@@ -1,9 +1,9 @@
-using ARMonopoly_Medium_Scale.Core;
+using ARMonopoly_V3___Medium_Scale.Core;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ARMonopoly_Medium_Scale.UI
+namespace ARMonopoly_V3___Medium_Scale.UI
 {
     public class SimpleUI : MonoBehaviour
     {

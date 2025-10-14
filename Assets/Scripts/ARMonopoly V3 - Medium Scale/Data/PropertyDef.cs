@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale.Data
+namespace ARMonopoly_V3___Medium_Scale.Data
 {
     [CreateAssetMenu(menuName="ARMonopolyV2-MediumScale/Property")]
     public class PropertyDef : ScriptableObject

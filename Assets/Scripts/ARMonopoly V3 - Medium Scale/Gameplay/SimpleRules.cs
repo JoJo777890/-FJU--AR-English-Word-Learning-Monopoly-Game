@@ -1,11 +1,11 @@
 // SimpleRules.cs
 
-using ARMonopoly_Medium_Scale.Board;
-using ARMonopoly_Medium_Scale.Core;
-using ARMonopoly_Medium_Scale.Services;
+using ARMonopoly_V3___Medium_Scale.Board;
+using ARMonopoly_V3___Medium_Scale.Core;
+using ARMonopoly_V3___Medium_Scale.Services;
 using UnityEngine;
 
-namespace ARMonopoly_Medium_Scale.Gameplay
+namespace ARMonopoly_V3___Medium_Scale.Gameplay
 {
     public class SimpleRules : MonoBehaviour
     {
