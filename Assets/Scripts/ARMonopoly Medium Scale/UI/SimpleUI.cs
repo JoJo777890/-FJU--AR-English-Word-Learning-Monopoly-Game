@@ -35,9 +35,9 @@ namespace ARMonopoly_Medium_Scale.UI
             GameEvents.DiceRolled       += OnDice;
             GameEvents.MoneyChanged     += OnMoney;
             GameEvents.BuyPrompt        += OnBuyPrompt;
-            GameEvents.PropertyBought   += e => Log($"P{e.playerId} bought {e.propertyName} (${e.price}).");
-            GameEvents.RentPaid         += e => Log($"P{e.payerId} paid ${e.amount} to P{e.ownerId} ({e.propertyName}).");
-            GameEvents.DistancesUpdated += s => { if (distancesText) distancesText.text = s; };
+            GameEvents.PropertyBought   += e => Log($"P{e.playerId} bought {e.propertyName} (${e.price})."); //--------------- Create "OnPropertyBought" function
+            GameEvents.RentPaid         += e => Log($"P{e.payerId} paid ${e.amount} to P{e.ownerId} ({e.propertyName})."); //------- Create "OnRentPaid" function
+            GameEvents.DistancesUpdated += s => { if (distancesText) distancesText.text = s; }; //------------------------------------ Create "OnDistancesUpdated" function
             GameEvents.CardDrawn        += OnCardDrawn;
         }
         void OnDisable()
@@ -78,7 +78,8 @@ namespace ARMonopoly_Medium_Scale.UI
         {
             Debug.Log($"[UI] Showing BuyPanel for P{e.playerId} {e.propertyName} ${e.price}"); // --Debug
             
-            pendingPlayerId = e.playerId; pendingPropId = e.propertyId;
+            pendingPlayerId = e.playerId; 
+            pendingPropId = e.propertyId;
             if (buyPanel)
             {
                 buyPanel.SetActive(true);

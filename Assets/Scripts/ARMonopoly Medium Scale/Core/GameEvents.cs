@@ -51,7 +51,7 @@ namespace ARMonopoly_Medium_Scale.Core
         {
             TurnEnded?.Invoke(pid);
         }
-        public static void RaisePropertyLanded(PropertyLanded e)
+        public static void RaisePropertyLanded(PropertyLanded e) // All "e" means "event argument"
         {
             PropertyLanded?.Invoke(e);
         }

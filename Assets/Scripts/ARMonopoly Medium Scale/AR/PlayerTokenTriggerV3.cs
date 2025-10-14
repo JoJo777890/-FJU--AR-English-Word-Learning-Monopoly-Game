@@ -75,7 +75,7 @@ namespace ARMonopoly_Medium_Scale.AR
 
                 float d = Vector3.Distance(transform.position, prop.transform.position);
                 bool close = d < triggerDistance;
-                debug += $"{prop.TargetName.Substring(0, 10)} distance={d:F3}{(close ? " (close)" : "")}\n";
+                debug += $"{prop.TargetName.Substring(0, 10)} distance={d:F3}{(close ? " (close)" : "")}\n"; // ".Substring(0, 10)" is for e.g., "Location_A---Patterned" with only the "Location_A".
 
                 foreach (Transform c in prop.transform)
                 {
