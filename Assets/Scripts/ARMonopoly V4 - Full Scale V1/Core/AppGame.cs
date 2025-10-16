@@ -1,10 +1,11 @@
+using System;
 using UnityEngine;
 
 namespace ARMonopoly_V4___Full_Scale_V1.Core
 {
-    public class App : MonoBehaviour
+    public class AppGame : MonoBehaviour
     {
-        public static App Instance { get; private set; }
+        public static AppGame Instance { get; private set; }
 
         private void Awake()
         {
@@ -20,7 +21,12 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
                 Destroy(gameObject); // Destroy any duplicates
             }
         }
-        
+
+        private void Start()
+        {
+            StartGame();
+        }
+
         private void StartGame()
         {
             GameStateMachine.Instance.SetState(GameState.Playing);

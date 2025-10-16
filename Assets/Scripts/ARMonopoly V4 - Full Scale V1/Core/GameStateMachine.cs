@@ -8,6 +8,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
     {
         private GameState _state;
 
+        // Singleton Class
         public static GameStateMachine Instance { get; private set; }
 
         private void Awake()
@@ -46,6 +47,15 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         Paused, 
         Results
     }
+    // Currently, there's no: 
+    // (
+    // Boot,
+    // Scanning, 
+    // Calibrating,
+    // BoardReady, 
+    // Paused, 
+    // Results
+    // )
 }
 
 
