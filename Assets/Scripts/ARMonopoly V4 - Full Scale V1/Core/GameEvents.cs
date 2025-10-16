@@ -1,5 +1,4 @@
 using System;
-using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Data;
 
 namespace ARMonopoly_V4___Full_Scale_V1.Core
 {
@@ -139,10 +138,10 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         public int playerId; 
         public int money;
     }
-    public struct CardDrawn 
-    {
-        public DeckType deck; 
-        public string title; 
-        public string body;
-    }
+    // public struct CardDrawn 
+    // {
+    //     public DeckType deck; 
+    //     public string title; 
+    //     public string body;
+    // }
 }
