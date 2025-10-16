@@ -8,6 +8,8 @@ namespace ARMonopoly_V4___Full_Scale_V1.Data
         public string id;               // stable key (e.g., "TOKYO_TOWER")
         public string displayName;
         public int price = 100;
+        public int houseCost = 100;
+        public int hotelCost = 200;
         public int[] rentTiers = {20, 40, 60, 80, 100};  // index 0 = base (no houses)
         public bool isUtility = false;
         public bool isRailroad = false;
