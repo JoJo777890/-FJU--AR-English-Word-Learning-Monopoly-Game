@@ -11,10 +11,10 @@ namespace ARMonopoly_V4___Full_Scale_V1.Data
 
         void OnEnable() {
             _map = new();
-            foreach (var p in properties)
+            foreach (var property in properties)
             {
-                if (p && !string.IsNullOrEmpty(p.id))
-                    _map[p.id] = p;
+                if (property && !string.IsNullOrEmpty(property.id))
+                    _map[property.id] = property;
             }
         }
         public PropertyDef Get(string id) => (_map != null && _map.TryGetValue(id, out var d)) ? d : null;

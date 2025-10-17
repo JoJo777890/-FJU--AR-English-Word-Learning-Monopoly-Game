@@ -2,6 +2,7 @@ using ARMonopoly_V3___Medium_Scale.Data;
 using ARMonopoly_V3___Medium_Scale.Players;
 using ARMonopoly_V3___Medium_Scale.Services;
 using UnityEngine;
+using PlayerTag = ARMonopoly_V4___Full_Scale_V1.Player.PlayerTag;
 
 namespace ARMonopoly_V3___Medium_Scale.Core
 {

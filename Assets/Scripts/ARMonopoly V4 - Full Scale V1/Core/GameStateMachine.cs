@@ -43,6 +43,11 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         Scanning, 
         Calibrating,
         BoardReady, 
+        WaitingForTurnStart, 
+        WaitingForPlayerAction, 
+        SpellingChallenge, 
+        TurnEnd, 
+        PlayerTurn, 
         Playing, 
         Paused, 
         Results

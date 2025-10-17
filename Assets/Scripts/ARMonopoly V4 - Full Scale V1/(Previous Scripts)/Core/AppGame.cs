@@ -2,6 +2,7 @@ using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Data;
 using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Players;
 using ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Services;
 using UnityEngine;
+using PlayerTag = ARMonopoly_V4___Full_Scale_V1.Player.PlayerTag;
 
 namespace ARMonopoly_V4___Full_Scale_V1._Previous_Scripts_.Core
 {
