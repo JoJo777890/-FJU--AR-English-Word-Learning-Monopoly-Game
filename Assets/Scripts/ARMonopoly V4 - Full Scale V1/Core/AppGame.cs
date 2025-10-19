@@ -52,6 +52,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         
         private void Start()
         {
+            UpdateGameState(GameState.GameStart);
             // BankRegisterPlayer();
         }
 
@@ -66,7 +67,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
             currentState = newState;
 
             // The switch statement determines what happens when we enter a new state.
-            // These are for visualizing the Core Game-State Flow.
+            // These are also for "visualizing" the Core Game-State Flow.
             switch (currentState)
             {
                 case GameState.GameStart:
@@ -78,56 +79,56 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
                 
                 case GameState.TurnStart:
                     // ...Write Here
-                    GameEvents.RaiseTurnStart();
+                    // GameEvents.RaiseTurnStart();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.RollDice);
                     break;
                 
                 case GameState.RollDice:
                     // ...Write Here
-                    GameEvents.RaiseRollDice();
+                    // GameEvents.RaiseRollDice();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.WaitForPlayerToMoveToken);
                     break;
                 
                 case GameState.WaitForPlayerToMoveToken:
                     // ...Write Here
-                    GameEvents.RaiseWaitForPlayerToMoveToken();
+                    // GameEvents.RaiseWaitForPlayerToMoveToken();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.PlayerMovedToken);
                     break;
                 
                 case GameState.PlayerMovedToken:
                     // ...Write Here
-                    GameEvents.RaiseWaitForPlayerToMoveToken();
+                    // GameEvents.RaiseWaitForPlayerToMoveToken();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.PayRent);
                     break;
                 
                 case GameState.PayRent:
                     // ...Write Here
-                    GameEvents.RaisePayRent();
+                    // GameEvents.RaisePayRent();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.BuyProperty);
                     break;
                 
                 case GameState.BuyProperty:
                     // ...Write Here
-                    GameEvents.RaiseBuyProperty();
+                    // GameEvents.RaiseBuyProperty();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.TurnEnd);
                     break;
                 
                 case GameState.TurnEnd:
                     // ...Write Here
-                    GameEvents.RaiseTurnEnd();
+                    // GameEvents.RaiseTurnEnd();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.GameEnd);
                     break;
                 
                 case GameState.GameEnd:
                     // ...Write Here
-                    GameEvents.RaiseGameEnd();
+                    // GameEvents.RaiseGameEnd();
                     PrintCurrentGameState();
                     break;
                 //

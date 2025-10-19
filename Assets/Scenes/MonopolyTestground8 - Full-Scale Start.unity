@@ -972,7 +972,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &224926666
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2003,7 +2003,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &419107049
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2303,9 +2303,8 @@ GameObject:
   - component: {fileID: 462769227}
   - component: {fileID: 462769230}
   - component: {fileID: 462769229}
-  - component: {fileID: 462769228}
   m_Layer: 5
-  m_Name: Game Start
+  m_Name: Start Game UI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2325,39 +2324,13 @@ RectTransform:
   m_Children:
   - {fileID: 1687726006}
   - {fileID: 506997981}
-  m_Father: {fileID: 1266961585}
+  m_Father: {fileID: 965891085}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &462769228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 462769226}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dec1b6a70474924491b7f4b4f06f156, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turnText: {fileID: 0}
-  diceText: {fileID: 1060147068}
-  moneyTexts:
-  - {fileID: 0}
-  - {fileID: 0}
-  distancesText: {fileID: 0}
-  logText: {fileID: 0}
-  buyPanel: {fileID: 0}
-  buyLabel: {fileID: 0}
-  buyBtn: {fileID: 0}
-  cardPanel: {fileID: 0}
-  cardTitle: {fileID: 0}
-  cardBody: {fileID: 0}
-  cardOkBtn: {fileID: 0}
 --- !u!114 &462769229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2925,19 +2898,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 506997983}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1872815469}
-        m_TargetAssemblyTypeName: ARMonopoly_V4___Full_Scale_V1.Core.AppGame, Assembly-CSharp
-        m_MethodName: GameStart
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &506997983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6039,14 +6000,14 @@ GameObject:
   - component: {fileID: 965891085}
   - component: {fileID: 965891088}
   - component: {fileID: 965891087}
-  - component: {fileID: 965891086}
+  - component: {fileID: 965891089}
   m_Layer: 5
   m_Name: Full Scale Stats
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &965891085
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6064,6 +6025,7 @@ RectTransform:
   - {fileID: 917014942}
   - {fileID: 1551334479}
   - {fileID: 1939632685}
+  - {fileID: 462769227}
   m_Father: {fileID: 1266961585}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6071,32 +6033,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &965891086
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 965891084}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6dec1b6a70474924491b7f4b4f06f156, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turnText: {fileID: 1003733148}
-  diceText: {fileID: 1229282384}
-  moneyTexts:
-  - {fileID: 950156956}
-  - {fileID: 1576723690}
-  distancesText: {fileID: 1252549829}
-  logText: {fileID: 1582121066}
-  buyPanel: {fileID: 1551334478}
-  buyLabel: {fileID: 1113229067}
-  buyBtn: {fileID: 1215103486}
-  cardPanel: {fileID: 917014941}
-  cardTitle: {fileID: 35447843}
-  cardBody: {fileID: 489603828}
-  cardOkBtn: {fileID: 1511967927}
 --- !u!114 &965891087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6135,6 +6071,20 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 965891084}
   m_CullTransparentMesh: 1
+--- !u!114 &965891089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965891084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e1552b9e8db673478d92d35b517d2cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startGameUI: {fileID: 462769226}
+  startBtn: {fileID: 506997982}
 --- !u!1 &979547117
 GameObject:
   m_ObjectHideFlags: 0
@@ -8593,7 +8543,6 @@ RectTransform:
   - {fileID: 2085645716}
   - {fileID: 354927483}
   - {fileID: 965891085}
-  - {fileID: 462769227}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -10248,7 +10197,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1551334479
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12671,7 +12620,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1939632685
 RectTransform:
   m_ObjectHideFlags: 0
