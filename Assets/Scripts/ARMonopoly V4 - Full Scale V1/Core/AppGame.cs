@@ -68,47 +68,56 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
             switch (currentState)
             {
                 case GameState.GameStart:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: GameStart...)");
                     UpdateGameState(GameState.TurnStart);
                     break;
-                //
+                
                 case GameState.TurnStart:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: TurnStart...)");
                     UpdateGameState(GameState.RollDice);
                     break;
-                //
+                
                 case GameState.RollDice:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: RollDice...)");
                     UpdateGameState(GameState.WaitForPlayerToMoveToken);
                     break;
-                //
+                
                 case GameState.WaitForPlayerToMoveToken:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: WaitForPlayerToMoveToken...)");
                     UpdateGameState(GameState.PlayerMovedToken);
                     break;
-                //
+                
                 case GameState.PlayerMovedToken:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: PlayerMovedToken...)");
                     UpdateGameState(GameState.PayRent);
                     break;
-                //
+                
                 case GameState.PayRent:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: PayRent...)");
                     UpdateGameState(GameState.BuyProperty);
                     break;
-                //
+                
                 case GameState.BuyProperty:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: BuyProperty...)");
                     UpdateGameState(GameState.TurnEnd);
                     break;
-                //
+                
                 case GameState.TurnEnd:
-                    
-                    UpdateGameState(GameState.WaitingForTurnStart);
+                    // ...Write Here
+                    Debug.Log("(Current_State: TurnEnd...)");
+                    UpdateGameState(GameState.GameEnd);
                     break;
-                //
+                
                 case GameState.GameEnd:
-                    
+                    // ...Write Here
+                    Debug.Log("(Current_State: GameEnd...)");
                     break;
                 //
                 //
