@@ -52,14 +52,14 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         
         private void Start()
         {
-            UpdateGameState(GameState.GameStart);
+            UpdateGameState(GameState.GameSetup);
             // BankRegisterPlayer();
         }
 
-        public void GameStart()
-        {
-            UpdateGameState(GameState.GameStart);
-        }
+        // public void GameStart()
+        // {
+        //     UpdateGameState(GameState.GameSetup);
+        // }
             
         // This is the core of the GameManager. It controls the game flow.
         public void UpdateGameState(GameState newState)
@@ -70,23 +70,30 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
             // These are also for "visualizing" the Core Game-State Flow.
             switch (currentState)
             {
-                case GameState.GameStart:
+                case GameState.GameSetup:
                     // ...Write Here
-                    GameEvents.RaiseGameStart();
+                    GameEvents.RaiseGameSetup();
                     PrintCurrentGameState();
-                    UpdateGameState(GameState.TurnStart);
+                    UpdateGameState(GameState.TurnStarted);
                     break;
                 
-                case GameState.TurnStart:
+                case GameState.GameStarted:
                     // ...Write Here
-                    // GameEvents.RaiseTurnStart();
+                    // GameEvents.RaiseGameStarted();
                     PrintCurrentGameState();
-                    UpdateGameState(GameState.RollDice);
+                    UpdateGameState(GameState.TurnStarted);
                     break;
                 
-                case GameState.RollDice:
+                case GameState.TurnStarted:
                     // ...Write Here
-                    // GameEvents.RaiseRollDice();
+                    // GameEvents.RaiseTurnStarted();
+                    PrintCurrentGameState();
+                    UpdateGameState(GameState.RolledDice);
+                    break;
+                
+                case GameState.RolledDice:
+                    // ...Write Here
+                    // GameEvents.RaiseRolledDice();
                     PrintCurrentGameState();
                     UpdateGameState(GameState.WaitForPlayerToMoveToken);
                     break;
@@ -116,19 +123,19 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
                     // ...Write Here
                     // GameEvents.RaiseBuyProperty();
                     PrintCurrentGameState();
-                    UpdateGameState(GameState.TurnEnd);
+                    UpdateGameState(GameState.TurnEnded);
                     break;
                 
-                case GameState.TurnEnd:
+                case GameState.TurnEnded:
                     // ...Write Here
-                    // GameEvents.RaiseTurnEnd();
+                    // GameEvents.RaiseTurnEnded();
                     PrintCurrentGameState();
-                    UpdateGameState(GameState.GameEnd);
+                    UpdateGameState(GameState.GameEnded);
                     break;
                 
-                case GameState.GameEnd:
+                case GameState.GameEnded:
                     // ...Write Here
-                    // GameEvents.RaiseGameEnd();
+                    // GameEvents.RaiseGameEnded();
                     PrintCurrentGameState();
                     break;
                 //

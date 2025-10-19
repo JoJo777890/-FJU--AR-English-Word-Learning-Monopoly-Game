@@ -29,21 +29,22 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
 
     public enum GameState
     {
-        GameSetup, 
-        WaitingForTurnStart, 
-        PlayerTurn, 
-        WaitingForPlayerAction, 
-        SpellingChallenge, 
+        // GameSetup, 
+        // WaitingForTurnStart, 
+        // PlayerTurn, 
+        // WaitingForPlayerAction, 
+        // SpellingChallenge, 
         //
-        GameStart, 
-        TurnStart,
-        RollDice, 
+        GameSetup,
+        GameStarted, 
+        TurnStarted,
+        RolledDice, 
         WaitForPlayerToMoveToken, 
         PlayerMovedToken,
         PayRent, 
         BuyProperty, 
-        TurnEnd, 
-        GameEnd
+        TurnEnded, 
+        GameEnded
     }
     // Example: 
     // (

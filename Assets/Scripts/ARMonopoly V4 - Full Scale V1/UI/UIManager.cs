@@ -14,11 +14,11 @@ namespace ARMonopoly_V4___Full_Scale_V1.UI
 
         private void OnEnable()
         {
-            GameEvents.GameStart += OnStartMenu;
+            GameEvents.GameSetup += OnStartMenu;
         }
         private void OnDisable()
         {
-            GameEvents.GameStart -= OnStartMenu;
+            GameEvents.GameSetup -= OnStartMenu;
         }
 
         private void OnStartMenu()
@@ -26,6 +26,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.UI
             startBtn.onClick.RemoveAllListeners();
             startBtn.onClick.AddListener(() =>
             {
+                GameEvents.RaiseGameStarted();
                 HideStartMenu();
             });
         }
