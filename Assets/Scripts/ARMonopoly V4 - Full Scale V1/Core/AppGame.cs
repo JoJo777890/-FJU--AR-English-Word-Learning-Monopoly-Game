@@ -52,10 +52,12 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         
         private void Start()
         {
-            // The game starts in the setup phase.
-            UpdateGameState(GameState.GameStart);
-            
             // BankRegisterPlayer();
+        }
+
+        public void GameStart()
+        {
+            UpdateGameState(GameState.GameStart);
         }
             
         // This is the core of the GameManager. It controls the game flow.
@@ -64,59 +66,69 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
             currentState = newState;
 
             // The switch statement determines what happens when we enter a new state.
+            // These are for visualizing the Core Game-State Flow.
             switch (currentState)
             {
                 case GameState.GameStart:
                     // ...Write Here
-                    Debug.Log("(Current_State: GameStart...)");
+                    GameEvents.RaiseGameStart();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.TurnStart);
                     break;
                 
                 case GameState.TurnStart:
                     // ...Write Here
-                    Debug.Log("(Current_State: TurnStart...)");
+                    GameEvents.RaiseTurnStart();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.RollDice);
                     break;
                 
                 case GameState.RollDice:
                     // ...Write Here
-                    Debug.Log("(Current_State: RollDice...)");
+                    GameEvents.RaiseRollDice();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.WaitForPlayerToMoveToken);
                     break;
                 
                 case GameState.WaitForPlayerToMoveToken:
                     // ...Write Here
-                    Debug.Log("(Current_State: WaitForPlayerToMoveToken...)");
+                    GameEvents.RaiseWaitForPlayerToMoveToken();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.PlayerMovedToken);
                     break;
                 
                 case GameState.PlayerMovedToken:
                     // ...Write Here
-                    Debug.Log("(Current_State: PlayerMovedToken...)");
+                    GameEvents.RaiseWaitForPlayerToMoveToken();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.PayRent);
                     break;
                 
                 case GameState.PayRent:
                     // ...Write Here
-                    Debug.Log("(Current_State: PayRent...)");
+                    GameEvents.RaisePayRent();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.BuyProperty);
                     break;
                 
                 case GameState.BuyProperty:
                     // ...Write Here
-                    Debug.Log("(Current_State: BuyProperty...)");
+                    GameEvents.RaiseBuyProperty();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.TurnEnd);
                     break;
                 
                 case GameState.TurnEnd:
                     // ...Write Here
-                    Debug.Log("(Current_State: TurnEnd...)");
+                    GameEvents.RaiseTurnEnd();
+                    PrintCurrentGameState();
                     UpdateGameState(GameState.GameEnd);
                     break;
                 
                 case GameState.GameEnd:
                     // ...Write Here
-                    Debug.Log("(Current_State: GameEnd...)");
+                    GameEvents.RaiseGameEnd();
+                    PrintCurrentGameState();
                     break;
                 //
                 //
@@ -161,6 +173,16 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
                 //     UpdateGameState(GameState.WaitingForTurnStart);
                 //     break;
             }
+        }
+
+        public GameState GetCurrentGameState()
+        {
+            return currentState;
+        }
+
+        public void PrintCurrentGameState()
+        {
+            Debug.Log($"(Current_State: {GetCurrentGameState()})...)");
         }
         
         // public void SetCurrentPlayer(int pid)

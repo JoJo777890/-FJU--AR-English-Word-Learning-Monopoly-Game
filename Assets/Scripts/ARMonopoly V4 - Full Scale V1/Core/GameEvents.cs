@@ -52,7 +52,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         {
             TurnStart?.Invoke();
         }
-        public static void RaisedRollDice()
+        public static void RaiseRollDice()
         {
             RollDice?.Invoke();
         }
