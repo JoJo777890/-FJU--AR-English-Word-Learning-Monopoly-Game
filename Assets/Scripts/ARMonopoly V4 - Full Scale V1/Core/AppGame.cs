@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using ARMonopoly_V4___Full_Scale_V1.Data;
 using ARMonopoly_V4___Full_Scale_V1.Economy;
-using ARMonopoly_V4___Full_Scale_V1.Players;
 using UnityEngine;
 
 namespace ARMonopoly_V4___Full_Scale_V1.Core
@@ -44,19 +43,19 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         
         [SerializeField] private GameState currentState;
         
-        private List<PlayerTag> players;
-        private int currentPlayerIndex = 0;
-        
-        public GameConfig gameConfig;
-        
-        public int CurrentPlayerId { get; private set; } = 0;
+        // private List<PlayerTag> players;
+        // private int currentPlayerIndex = 0;
+        //
+        // public GameConfig gameConfig;
+        //
+        // public int CurrentPlayerId { get; private set; } = 0;
         
         private void Start()
         {
             // The game starts in the setup phase.
-            UpdateGameState(GameState.GameSetup);
+            UpdateGameState(GameState.GameStart);
             
-            BankRegisterPlayer();
+            // BankRegisterPlayer();
         }
             
         // This is the core of the GameManager. It controls the game flow.
@@ -164,22 +163,22 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
             }
         }
         
-        public void SetCurrentPlayer(int pid)
-        {
-            CurrentPlayerId = pid;
-        }
+        // public void SetCurrentPlayer(int pid)
+        // {
+        //     CurrentPlayerId = pid;
+        // }
 
-        private void BankRegisterPlayer()
-        {
-            foreach (var p in FindObjectsOfType<PlayerTag>())
-            {
-                int start = (p.startingMoney > 0) ? p.startingMoney : gameConfig.defaultStartMoney;
-                Bank.Instance.RegisterPlayer(
-                    p.playerId,
-                    start
-                );
-            }
-        }
+        // private void BankRegisterPlayer()
+        // {
+        //     foreach (var p in FindObjectsOfType<PlayerTag>())
+        //     {
+        //         int start = (p.startingMoney > 0) ? p.startingMoney : gameConfig.defaultStartMoney;
+        //         Bank.Instance.RegisterPlayer(
+        //             p.playerId,
+        //             start
+        //         );
+        //     }
+        // }
     }
 }
 
