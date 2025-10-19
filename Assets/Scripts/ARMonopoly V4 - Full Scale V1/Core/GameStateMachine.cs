@@ -6,7 +6,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
 {
     public class GameStateMachine: MonoBehaviour
     {
-        private GameState _state;
+        public GameState State { get; private set; }
 
         // Singleton Class
         public static GameStateMachine Instance { get; private set; }
@@ -25,29 +25,27 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
                 Destroy(gameObject); // Destroy any duplicates
             }
         }
-        
-        public GameState GetState()
-        {
-            return _state;
-        }
-
-        public void SetState(GameState state)
-        {
-            _state = state;
-        }
     }
 
     public enum GameState
     {
-        Boot,
-        Scanning, 
-        Calibrating,
-        BoardReady, 
-        Playing, 
-        Paused, 
-        Results
+        GameSetup, 
+        WaitingForTurnStart, 
+        PlayerTurn, 
+        WaitingForPlayerAction, 
+        SpellingChallenge, 
+        //
+        GameStart, 
+        TurnStart,
+        RollDice, 
+        WaitForPlayerToMoveToken, 
+        PlayerMovedToken,
+        PayRent, 
+        BuyProperty, 
+        TurnEnd, 
+        GameEnd
     }
-    // Currently, there's no: 
+    // Example: 
     // (
     // Boot,
     // Scanning, 

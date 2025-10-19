@@ -32,7 +32,55 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         public static event Action<int> SentToJail;              // pid
         public static event Action<int> ReleasedFromJail;        // pid
 
+        //GameStates
+        public static event Action GameStart;
+        public static event Action TurnStart;
+        public static event Action RollDice;
+        public static event Action WaitForPlayerToMoveToken;
+        public static event Action PlayerMovedToken;
+        public static event Action PayRent;
+        public static event Action BuyProperty;
+        public static event Action TurnEnd;
+        public static event Action GameEnd;
+        
         // Raisers
+        public static void RaiseGameStart()
+        {
+            GameStart?.Invoke();
+        }
+        public static void RaiseTurnStart()
+        {
+            TurnStart?.Invoke();
+        }
+        public static void RaisedRollDice()
+        {
+            RollDice?.Invoke();
+        }
+        public static void RaiseWaitForPlayerToMoveToken()
+        {
+            WaitForPlayerToMoveToken?.Invoke();
+        }
+        public static void RaiseplayerMovedToken()
+        {
+            PlayerMovedToken?.Invoke();
+        }
+        public static void RaisePayRent()
+        {
+            PayRent?.Invoke();
+        }
+        public static void RaiseBuyProperty()
+        {
+            BuyProperty?.Invoke();
+        }
+        public static void RaiseTurnEnd()
+        {
+            TurnEnd?.Invoke();
+        }
+        public static void RaiseGameEnd()
+        {
+            GameEnd?.Invoke();
+        }
+        //
         public static void RaiseDistancesUpdated(string s)
         {
             DistancesUpdated?.Invoke(s);
