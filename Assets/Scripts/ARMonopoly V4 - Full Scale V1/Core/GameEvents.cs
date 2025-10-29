@@ -38,7 +38,7 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         public static event Action TurnStarted;
         public static event Action RolledDice;
         public static event Action WaitForPlayerToMoveToken;
-        public static event Action PlayerMovedToken;
+        public static event Action PropertyLanded;
         public static event Action PayRent;
         public static event Action BuyProperty;
         public static event Action TurnEnded;
@@ -65,9 +65,9 @@ namespace ARMonopoly_V4___Full_Scale_V1.Core
         {
             WaitForPlayerToMoveToken?.Invoke();
         }
-        public static void RaiseplayerMovedToken()
+        public static void RaisePropertyLanded()
         {
-            PlayerMovedToken?.Invoke();
+            PropertyLanded?.Invoke();
         }
         public static void RaisePayRent()
         {
