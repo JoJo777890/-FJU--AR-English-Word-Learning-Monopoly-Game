@@ -25,6 +25,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         private Dictionary<string, float> _dwellTimers = new Dictionary<string, float>();
         private HashSet<string> _currentlyInside = new HashSet<string>();
 
+        // --- FIX ---
+        // Cache the original scales of all content children
+        private Dictionary<Transform, Vector3> _baseScales = new Dictionary<Transform, Vector3>();
+        // --- END FIX ---
+
         void Start()
         {
             _playerTag = GetComponent<PlayerTag>();
@@ -36,6 +41,20 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
             foreach (var prop in AllProperties)
             {
                 _dwellTimers[prop.ID] = 0f;
+
+                // --- FIX ---
+                // Find and cache the base scale of all content children
+                foreach (Transform child in prop.transform)
+                {
+                    if (child.name.EndsWith(_config.ContentSuffix))
+                    {
+                        if (!_baseScales.ContainsKey(child))
+                        {
+                            _baseScales[child] = child.localScale;
+                        }
+                    }
+                }
+                // --- END FIX ---
             }
         }
 
@@ -43,7 +62,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         {
             if (_playerObserver == null || _playerObserver.TargetStatus.Status < Status.TRACKED)
             {
-                // Optional: You could raise exit events for all _currentlyInside properties if you lose tracking
                 return;
             }
 
@@ -96,16 +114,30 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
 
         void ScaleContent(Transform propTransform, bool isClose)
         {
+            // --- MODIFIED METHOD ---
             foreach (Transform child in propTransform)
             {
+                // We only check for suffix, but you could also check _baseScales.ContainsKey(child)
                 if (child.name.EndsWith(_config.ContentSuffix))
                 {
-                    // This assumes you cache the base scale somewhere, or just scale from 1.
-                    // For simplicity, we'll just set it.
-                    float scale = isClose ? _config.ScaleUpFactor : 1.0f;
-                    child.localScale = Vector3.one * scale;
+                    // Try to get the original base scale
+                    if (_baseScales.TryGetValue(child, out Vector3 baseScale))
+                    {
+                        // If we found it, scale relative to it
+                        float scaleFactor = isClose ? _config.ScaleUpFactor : 1.0f;
+                        child.localScale = baseScale * scaleFactor;
+                    }
+                    else
+                    {
+                        // Fallback (the old, buggy logic) just in case it wasn't cached
+                        // This shouldn't be hit if Start() runs correctly
+                        float scale = isClose ? _config.ScaleUpFactor : 1.0f;
+                        child.localScale = Vector3.one * scale;
+                    }
                 }
             }
+            // --- END MODIFIED METHOD ---
         }
     }
 }
+
