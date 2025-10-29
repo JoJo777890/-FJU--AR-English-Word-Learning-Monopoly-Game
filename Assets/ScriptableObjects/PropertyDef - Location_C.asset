@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 904d71a6f0edaba40abfac75a14458a3, type: 3}
   m_Name: PropertyDef - Location_C
   m_EditorClassIdentifier: 
-  PropertyID: 
-  DisplayName: 
+  PropertyID: ID_Location_C
+  DisplayName: Location_C
   Type: 0
-  Price: 0
-  BaseRent: 0
+  Price: 200
+  BaseRent: 40

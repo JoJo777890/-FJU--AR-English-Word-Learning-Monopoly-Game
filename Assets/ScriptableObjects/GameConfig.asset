@@ -9,11 +9,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 904d71a6f0edaba40abfac75a14458a3, type: 3}
-  m_Name: PropertyDef - Location_B
+  m_Script: {fileID: 11500000, guid: 1b0c9516412ee7c4ab13914fc5064b86, type: 3}
+  m_Name: GameConfig
   m_EditorClassIdentifier: 
-  PropertyID: ID_Location_B
-  DisplayName: Location_B
-  Type: 0
-  Price: 150
-  BaseRent: 30
+  StartingMoney: 1500
+  GoMoney: 200
+  JailFine: 50
+  MaxJailTurns: 3
+  AllowDoublesRule: 1
+  TriggerDistance: 0.07
+  DwellSeconds: 0.35
+  ScaleUpFactor: 1.3
+  ContentSuffix: Plane
