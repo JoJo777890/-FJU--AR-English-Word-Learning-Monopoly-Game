@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
-    [CreateAssetMenu(menuName = "AR Monopoly/Game Config")]
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Game Config")]
     public class GameConfig : ScriptableObject
     {
         [Header("Rules")]

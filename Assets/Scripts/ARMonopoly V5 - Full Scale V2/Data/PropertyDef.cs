@@ -4,7 +4,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
     public enum PropertyType { Normal, Utility, Railroad, Special }
 
-    [CreateAssetMenu(menuName = "AR Monopoly/Property Definition")]
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Def")]
     public class PropertyDef : ScriptableObject
     {
         [Header("Identity")]

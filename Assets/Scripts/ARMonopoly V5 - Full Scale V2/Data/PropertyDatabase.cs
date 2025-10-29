@@ -8,7 +8,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
     /// Holds a list of all properties in the game.
     /// This effectively replaces the "BoardDefinition" in an all-ImageTarget game.
     /// </summary>
-    [CreateAssetMenu(menuName = "AR Monopoly/Property Database")]
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Database")]
     public class PropertyDatabase : ScriptableObject
     {
         public List<PropertyDef> AllProperties;

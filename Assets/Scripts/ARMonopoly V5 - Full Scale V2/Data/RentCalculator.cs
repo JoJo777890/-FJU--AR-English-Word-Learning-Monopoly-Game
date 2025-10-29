@@ -7,7 +7,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
     /// By making it an SO, you can swap it for a more complex one later
     /// (e.g., one that checks for monopolies) without changing other code.
     /// </summary>
-    [CreateAssetMenu(menuName = "AR Monopoly/Rent Calculator")]
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Rent Calculator")]
     public class RentCalculator : ScriptableObject
     {
         public int CalculateRent(PropertyDef property)
