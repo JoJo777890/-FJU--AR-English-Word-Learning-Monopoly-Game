@@ -1,4 +1,4 @@
-using ARMonopoly_V4___Full_Scale_V1.Data;
+using ARMonopoly_V4___Full_Scale_V1.Board;
 
 namespace ARMonopoly_V4___Full_Scale_V1.Economy
 {

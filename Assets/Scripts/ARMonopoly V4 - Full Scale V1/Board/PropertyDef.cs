@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ARMonopoly_V4___Full_Scale_V1.Data
+namespace ARMonopoly_V4___Full_Scale_V1.Board
 {
     [CreateAssetMenu(menuName="ARMonopolyV4-FullScale/Property")]
     public class PropertyDef : ScriptableObject
