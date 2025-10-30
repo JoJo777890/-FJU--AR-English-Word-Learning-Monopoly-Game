@@ -69,7 +69,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         {
             TurnText.text = $"Player {playerID}'s Turn";
             DiceText.text = "Roll the dice!";
-            HandleNotify($"Player {playerID}, it's your turn to roll.");
+            HandleNotify($"Player {playerID}, \nit's your turn to roll.");
         }
 
         void HandleDiceRolled(int playerID, int d1, int d2)
@@ -99,7 +99,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                 PlayerID = payload.PlayerID, 
                 PropertyID = payload.PropertyID
             };
-            BuyLabel.text = $"Player {payload.PlayerID}, buy {payload.DisplayName} for ${payload.Price}?";
+            BuyLabel.text = $"Player {payload.PlayerID}, \nbuy {payload.DisplayName} for ${payload.Price}?";
             BuyPanel.SetActive(true);
         }
 
