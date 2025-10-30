@@ -94,7 +94,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         void HandleBuyPrompt(BuyPromptPayload payload)
         {
-            _pendingBuyRequest = new BuyRequestPayload { PlayerID = payload.PlayerID, PropertyID = payload.PropertyID };
+            _pendingBuyRequest = new BuyRequestPayload 
+            {
+                PlayerID = payload.PlayerID, 
+                PropertyID = payload.PropertyID
+            };
             BuyLabel.text = $"Player {payload.PlayerID}, buy {payload.DisplayName} for ${payload.Price}?";
             BuyPanel.SetActive(true);
         }

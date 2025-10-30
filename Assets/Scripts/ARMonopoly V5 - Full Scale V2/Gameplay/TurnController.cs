@@ -43,7 +43,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             _jailTurns[playerID] = _config.MaxJailTurns;
         }
 
-        public int GetCurrentPlayerID() => PlayerOrder[_currentPlayerIndex];
+        public int GetCurrentPlayerID()
+        {
+            return PlayerOrder[_currentPlayerIndex];
+        }
 
         void StartFirstTurn()
         {
