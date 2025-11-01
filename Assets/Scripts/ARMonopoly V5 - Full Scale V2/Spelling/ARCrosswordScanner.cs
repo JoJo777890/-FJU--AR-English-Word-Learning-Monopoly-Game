@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 using UnityEngine;
 using Vuforia;
-using TMPro;
 
-namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
+namespace ARMonopoly_V5___Full_Scale_V2.Spelling
 {
     /// <summary>
     /// Modified version of your script to act as an on-demand service.

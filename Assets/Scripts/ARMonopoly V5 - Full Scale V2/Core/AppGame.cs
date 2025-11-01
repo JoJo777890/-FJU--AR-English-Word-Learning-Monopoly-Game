@@ -1,6 +1,8 @@
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
+using ARMonopoly_V5___Full_Scale_V2.Gameplay;
+using ARMonopoly_V5___Full_Scale_V2.Spelling;
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
@@ -9,7 +11,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
     /// Central singleton that holds references to core systems and data assets.
     /// Attached to the [GameSystems] GameObject.
     /// </summary>
-    [DefaultExecutionOrder(-100)]
     public class AppGame : MonoBehaviour
     {
         public static AppGame Instance { get; private set; }
@@ -19,16 +20,21 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public PropertyDatabase PropertyDB;
         public BoardDefinition Board;
         public RentCalculator RentCalculator;
+        public SpellingQuestionDatabase SpellingDB; // NEW
 
-        [Header("Core Systems")]
-        public Bank Bank { get; private set; }
+        [Header("Scene References")]
+        public ARCrosswordScanner CrosswordScanner; // NEW: Assign this in Inspector
+
+        // Services
         public GameStateMachine StateMachine { get; private set; }
+        public Bank Bank { get; private set; }
+        public InvestmentService Investments { get; private set; } // NEW
 
-        [Header("Runtime State")]
-        [Tooltip("The destination the current player is expected to move to.")]
-        public string ExpectedDestinationPropertyID;
+        // Runtime State
+        // The destination the current player is expected to move to.
+        public string ExpectedDestinationPropertyID { get; set; }
 
-        void Awake()
+        private void Awake()
         {
             if (Instance != null && Instance != this)
             {
@@ -36,40 +42,25 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
                 return;
             }
             Instance = this;
-
+            
             // Initialize core systems
-            Bank = new Bank();
             StateMachine = new GameStateMachine();
-            
-            // PlayerTag.cs will register itself with the Bank.
-            // This approach will be more decoupled.
-            
-            if (Config == null)
-            {
-                Debug.LogError("AppGame: GameConfig is not assigned!");
-            }
-            
-            // [[Old Code]]: 
-            // // Register players with the bank
-            // if (Config != null)
-            // {
-            //     foreach(var player in FindObjectsOfType<Scene.PlayerTag>())
-            //     {
-            //         Bank.RegisterPlayer(player.PlayerID, Config.StartingMoney);
-            //     }
-            // }
-            // else
-            // {
-            //     Debug.LogError("AppGame: GameConfig is not assigned!");
-            // }
-
-            Debug.Log("[AppGame] Initialized.");
+            Bank = new Bank();
+            Investments = new InvestmentService(Bank, Config); // Create new service
         }
 
         private void Start()
         {
-            // Move to the first state (will be handled by TurnController)
-            // StateMachine.SetState(GameState.PlayerTurn);
+            // Find the scanner if not assigned
+            if (CrosswordScanner == null)
+            {
+                CrosswordScanner = FindObjectOfType<ARCrosswordScanner>();
+                if (CrosswordScanner == null)
+                {
+                    Debug.LogError("AppGame: CRITICAL: ARCrosswordScanner not found in scene!");
+                }
+            }
         }
     }
 }
+

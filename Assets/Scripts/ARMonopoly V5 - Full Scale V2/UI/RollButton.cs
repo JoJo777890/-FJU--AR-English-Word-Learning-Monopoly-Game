@@ -5,38 +5,30 @@ using UnityEngine.UI;
 namespace ARMonopoly_V5___Full_Scale_V2.UI
 {
     /// <summary>
-    /// A simple helper script to find the TurnController and call OnRollClicked.
-    /// Attach this to your "Roll" button.
+    /// A simple helper script to hook the UI Button to the TurnController.
     /// </summary>
     [RequireComponent(typeof(Button))]
     public class RollButton : MonoBehaviour
     {
         private TurnController _turnController;
-        private Button _button;
 
-        void Start()
+        private void Start()
         {
             // Find the TurnController in the scene
             _turnController = FindObjectOfType<TurnController>();
             if (_turnController == null)
             {
-                Debug.LogError("RollButton: No TurnController found in scene!");
+                Debug.LogError("RollButton: Could not find TurnController!");
                 return;
             }
 
-            // Find the Button component on this GameObject
-            _button = GetComponent<Button>();
-            
-            // Add OnClick listener
-            _button.onClick.AddListener(OnClick);
+            // Hook up the OnClick event
+            GetComponent<Button>().onClick.AddListener(OnRollClicked);
         }
 
-        public void OnClick()
+        private void OnRollClicked()
         {
-            if (_turnController != null)
-            {
-                _turnController.OnRollClicked();
-            }
+            _turnController.OnRollClicked();
         }
     }
 }

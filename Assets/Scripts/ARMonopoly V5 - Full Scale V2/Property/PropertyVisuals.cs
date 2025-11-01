@@ -2,121 +2,92 @@ using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using UnityEngine;
-using Vuforia;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Property
 {
     /// <summary>
-    /// Attached to the Property's Image Target.
-    /// Manages its own scale based on proximity events.
-    /// Also reports when it is being tracked.
+    /// Attached to a Property's Image Target.
+    /// Listens for proximity events and scales its content.
     /// </summary>
-    [RequireComponent(typeof(PropertyTag), typeof(ObserverBehaviour))]
+    [RequireComponent(typeof(PropertyTag))]
     public class PropertyVisuals : MonoBehaviour
     {
-        // A static list of all properties currently being tracked by Vuforia
-        public static HashSet<PropertyTag> AllTrackedProperties = new HashSet<PropertyTag>();
-
-        private PropertyTag _propertyTag;
-        private ObserverBehaviour _propertyObserver;
         private GameConfig _config;
-        private Transform _contentChild;
-        private Vector3 _baseScale;
-        private HashSet<int> _playersInProximity = new HashSet<int>();
+        private string _propertyID;
+        
+        // Tracks which players are close
+        private HashSet<int> _playersNearby = new HashSet<int>();
+        
+        // Caches the original scales of child content
+        private Dictionary<Transform, Vector3> _baseScales = new Dictionary<Transform, Vector3>();
+        private List<Transform> _contentChildren = new List<Transform>();
 
         void Awake()
         {
-            _propertyTag = GetComponent<PropertyTag>();
-            _propertyObserver = GetComponent<ObserverBehaviour>();
-        }
-
-        void Start()
-        {
             _config = AppGame.Instance.Config;
-            if (_config == null)
-            {
-                Debug.LogError($"PropertyVisuals ({_propertyTag.PropertyID}): GameConfig not found!");
-                return;
-            }
-
-            // Find the content child to scale
+            _propertyID = GetComponent<PropertyTag>().PropertyID;
+            
+            // Find all content children and cache their base scales
             foreach (Transform child in transform)
             {
-                if (child.name.EndsWith(_config.ContentSuffix))
+                if (child.name.EndsWith(_config.PropertyContentSuffix))
                 {
-                    _contentChild = child;
-                    _baseScale = child.localScale;
-                    break;
+                    _contentChildren.Add(child);
+                    _baseScales[child] = child.localScale;
                 }
             }
-            if (_contentChild == null)
-                Debug.LogWarning($"PropertyVisuals ({_propertyTag.PropertyID}): No child found with suffix '{_config.ContentSuffix}' to scale.");
         }
 
         private void OnEnable()
         {
             GameEvents.OnProximityEnter += HandleProximityEnter;
             GameEvents.OnProximityExit += HandleProximityExit;
-            _propertyObserver.OnTargetStatusChanged += HandleTargetStatusChanged;
         }
 
         private void OnDisable()
         {
             GameEvents.OnProximityEnter -= HandleProximityEnter;
             GameEvents.OnProximityExit -= HandleProximityExit;
-            _propertyObserver.OnTargetStatusChanged -= HandleTargetStatusChanged;
-
-            // Clean up from static list if disabled/destroyed
-            if (_propertyTag != null)
-                AllTrackedProperties.Remove(_propertyTag);
-        }
-
-        private void HandleTargetStatusChanged(ObserverBehaviour ob, TargetStatus status)
-        {
-            bool isTracked = status.Status == Status.TRACKED || status.Status == Status.EXTENDED_TRACKED;
-
-            if (isTracked)
-            {
-                AllTrackedProperties.Add(_propertyTag);
-            }
-            else
-            {
-                AllTrackedProperties.Remove(_propertyTag);
-            }
         }
 
         private void HandleProximityEnter(ProximityPayload payload)
         {
-            // Is this event about *this* property?
-            if (payload.PropertyID == _propertyTag.PropertyID)
+            // Is this event for *this* property?
+            if (payload.PropertyID != _propertyID) return;
+
+            // Track the player
+            _playersNearby.Add(payload.PlayerID);
+
+            // Scale up (if not already)
+            if (_playersNearby.Count > 0)
             {
-                _playersInProximity.Add(payload.PlayerID);
-                UpdateScale();
+                SetScale(_config.PropertyScaleUpFactor);
             }
         }
 
         private void HandleProximityExit(ProximityPayload payload)
         {
-            // Is this event about *this* property?
-            if (payload.PropertyID == _propertyTag.PropertyID)
+            // Is this event for *this* property?
+            if (payload.PropertyID != _propertyID) return;
+
+            // Remove the player
+            _playersNearby.Remove(payload.PlayerID);
+
+            // Scale down ONLY if *no one* is nearby
+            if (_playersNearby.Count == 0)
             {
-                _playersInProximity.Remove(payload.PlayerID);
-                UpdateScale();
+                SetScale(1.0f);
             }
         }
 
-        private void UpdateScale()
+        private void SetScale(float scaleFactor)
         {
-            if (_contentChild == null) return;
-
-            // If *any* player is nearby, scale up.
-            if (_playersInProximity.Count > 0)
+            foreach (var child in _contentChildren)
             {
-                _contentChild.localScale = _baseScale * _config.ScaleUpFactor;
-            }
-            else
-            {
-                _contentChild.localScale = _baseScale;
+                if (_baseScales.TryGetValue(child, out var baseScale))
+                {
+                    child.localScale = baseScale * scaleFactor;
+                }
             }
         }
     }

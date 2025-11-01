@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
-    [CreateAssetMenu(menuName = "AR Monopoly/Spelling Question")]
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Spelling Question")]
     public class SpellingQuestion : ScriptableObject
     {
         [Tooltip("The question/clue to show the player.")]

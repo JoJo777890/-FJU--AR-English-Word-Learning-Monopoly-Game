@@ -3,6 +3,7 @@ using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Player;
+// FIXED: Using .Scene namespace
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
@@ -101,12 +102,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
             // 7. Change state to wait for the physical move
             _stateMachine.SetState(GameState.AwaitingPlayerMove);
-            
-            // // 4. Check for "Pass Go"    <----- I tried to move Step 4 here, but "Pass Go" message still appeared before player arrives at its destination.
-            // if (newIndex < oldIndex) // They wrapped around
-            // {
-            //     GameEvents.RaisePlayerPassedGo(CurrentPlayerID);
-            // }
         }
 
         /// <summary>

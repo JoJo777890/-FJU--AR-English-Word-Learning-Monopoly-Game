@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
-    [CreateAssetMenu(menuName = "AR Monopoly/Spelling Question Database")]
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Spelling Question Database")]
     public class SpellingQuestionDatabase : ScriptableObject
     {
         public List<SpellingQuestion> Questions = new List<SpellingQuestion>();

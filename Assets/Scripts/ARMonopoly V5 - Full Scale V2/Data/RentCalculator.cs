@@ -2,19 +2,18 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
-    /// <summary>
-    /// Calculates rent. Held by AppGame.
-    /// Create one from 'Assets > Create > AR Monopoly > Rent Calculator'.
-    /// </summary>
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Rent Calculator")]
     public class RentCalculator : ScriptableObject
     {
+        /// <summary>
+        /// Calculates rent for a given property.
+        /// </summary>
         public int CalculateRent(PropertyDef property)
         {
-            if (property == null) return 0;
-            
             // This is a simple implementation.
-            // Future logic would check for monopolies, houses, etc.
+            // You can expand this to check for monopolies (full sets) or houses.
+            if (property == null) return 0;
+
             return property.BaseRent;
         }
     }

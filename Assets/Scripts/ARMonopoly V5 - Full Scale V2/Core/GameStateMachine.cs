@@ -1,10 +1,11 @@
+using ARMonopoly_V5___Full_Scale_V2.Core;
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
 {
     /// <summary>
-    /// Manages the one true GameState.
-    /// It uses the 'GameState' enum defined in GameEvents.cs.
+    /// A service class (not a MonoBehaviour) that holds the one true game state.
+    /// Instantiated and held by AppGame.
     /// </summary>
     public class GameStateMachine
     {
@@ -15,6 +16,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
             CurrentState = GameState.Boot;
         }
 
+        /// <summary>
+        /// Sets the new game state and notifies all listeners.
+        /// </summary>
         public void SetState(GameState newState)
         {
             if (CurrentState == newState)
@@ -22,8 +26,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
 
             CurrentState = newState;
             Debug.Log($"[GameStateMachine] New State: {newState}");
-
-            // Notify all listeners that the state has changed
+            
+            // Fire the global event
             GameEvents.RaiseStateChanged(newState);
         }
     }
