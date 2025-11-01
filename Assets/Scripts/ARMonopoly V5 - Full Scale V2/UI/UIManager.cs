@@ -206,7 +206,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void HandlePropertyBought(PropertyPayload payload)
         {
-            AddLog($"Player {payload.PlayerID} bought {payload.PropertyName}!");
+            AddLog($"Player {payload.PlayerID} bought {payload.PropertyName} for ${payload.Price}!");
         }
 
         private void HandleRentPaid(RentPayload payload)

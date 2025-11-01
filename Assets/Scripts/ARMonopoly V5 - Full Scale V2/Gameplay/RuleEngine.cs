@@ -166,7 +166,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 {
                     PlayerID = playerID,
                     PropertyID = propToBuy.PropertyID,
-                    PropertyName = propToBuy.DisplayName
+                    PropertyName = propToBuy.DisplayName,
+                    Price = propToBuy.Price
                 });
             }
             else

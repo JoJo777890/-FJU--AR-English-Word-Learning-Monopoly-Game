@@ -83,6 +83,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public int PlayerID;
         public string PropertyID;
         public string PropertyName;
+        public int Price;
     }
 
     public struct RentPayload
