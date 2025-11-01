@@ -1,17 +1,15 @@
-using System.Collections.Generic;
+using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
-using ARMonopoly_V5___Full_Scale_V2.Player;
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
 {
     /// <summary>
-    /// Central singleton for the game.
-    /// Holds references to core systems and SOs.
-    /// Manages game state and services.
+    /// Central singleton that holds references to core systems and data assets.
+    /// Attached to the [GameSystems] GameObject.
     /// </summary>
-    [DefaultExecutionOrder(-200)] // Ensure this runs first
+    [DefaultExecutionOrder(-100)]
     public class AppGame : MonoBehaviour
     {
         public static AppGame Instance { get; private set; }
@@ -19,15 +17,16 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         [Header("Data Assets")]
         public GameConfig Config;
         public PropertyDatabase PropertyDB;
+        public BoardDefinition Board;
         public RentCalculator RentCalculator;
 
-        // Core Systems
-        public GameStateMachine StateMachine { get; private set; }
+        [Header("Core Systems")]
         public Bank Bank { get; private set; }
+        public GameStateMachine StateMachine { get; private set; }
 
-        // Runtime Lookups
-        private Dictionary<int, Wallet> _playerWallets = new Dictionary<int, Wallet>();
-        private Dictionary<string, int> _propertyOwners = new Dictionary<string, int>(); // PropertyID -> PlayerID
+        [Header("Runtime State")]
+        [Tooltip("The destination the current player is expected to move to.")]
+        public string ExpectedDestinationPropertyID;
 
         void Awake()
         {
@@ -37,52 +36,40 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
                 return;
             }
             Instance = this;
-            
-            // Initialize Core Systems
-            StateMachine = new GameStateMachine();
+
+            // Initialize core systems
             Bank = new Bank();
-        }
-
-        void Start()
-        {
-            StateMachine.SetState(GameState.WaitingForPlayers);
-            // In a real game, you'd wait for players to register
-            // For this demo, we find them all at the start
-            RegisterAllPlayers();
-            StateMachine.SetState(GameState.WaitingForRoll);
-        }
-
-        void RegisterAllPlayers()
-        {
-            var players = FindObjectsOfType<PlayerTag>();
-            foreach (var player in players)
+            StateMachine = new GameStateMachine();
+            
+            // PlayerTag.cs will register itself with the Bank.
+            // This approach will be more decoupled.
+            
+            if (Config == null)
             {
-                var wallet = player.GetComponent<Wallet>();
-                if (wallet != null)
-                {
-                    _playerWallets[player.PlayerID] = wallet;
-                    wallet.SetBalance(Config.StartingMoney);
-                }
+                Debug.LogError("AppGame: GameConfig is not assigned!");
             }
+            
+            // [[Old Code]]: 
+            // // Register players with the bank
+            // if (Config != null)
+            // {
+            //     foreach(var player in FindObjectsOfType<Scene.PlayerTag>())
+            //     {
+            //         Bank.RegisterPlayer(player.PlayerID, Config.StartingMoney);
+            //     }
+            // }
+            // else
+            // {
+            //     Debug.LogError("AppGame: GameConfig is not assigned!");
+            // }
+
+            Debug.Log("[AppGame] Initialized.");
         }
 
-        // --- Public API for Services ---
-
-        public Wallet GetWallet(int playerID)
+        private void Start()
         {
-            _playerWallets.TryGetValue(playerID, out var wallet);
-            return wallet;
-        }
-
-        public int GetPropertyOwner(string propertyID)
-        {
-            _propertyOwners.TryGetValue(propertyID, out var ownerID);
-            return ownerID == 0 ? -1 : ownerID; // Return -1 for unowned (assuming PlayerID > 0)
-        }
-
-        public void SetPropertyOwner(string propertyID, int playerID)
-        {
-            _propertyOwners[propertyID] = playerID;
+            // Move to the first state (will be handled by TurnController)
+            // StateMachine.SetState(GameState.PlayerTurn);
         }
     }
 }

@@ -1,28 +1,40 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
     /// <summary>
-    /// Holds a list of all properties in the game.
-    /// This effectively replaces the "BoardDefinition" in an all-ImageTarget game.
+    /// A database of all properties.
+    /// Create one from 'Assets > Create > AR Monopoly > Property Database'.
     /// </summary>
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Database")]
     public class PropertyDatabase : ScriptableObject
     {
         public List<PropertyDef> AllProperties;
 
-        private Dictionary<string, PropertyDef> _lookup;
+        private Dictionary<string, PropertyDef> _propertyMap;
 
         public PropertyDef GetProperty(string propertyID)
         {
-            if (_lookup == null)
-            {
-                _lookup = AllProperties.ToDictionary(p => p.PropertyID);
-            }
-            _lookup.TryGetValue(propertyID, out var def);
+            if (_propertyMap == null)
+                InitializeMap();
+
+            _propertyMap.TryGetValue(propertyID, out PropertyDef def);
             return def;
+        }
+
+        private void InitializeMap()
+        {
+            _propertyMap = new Dictionary<string, PropertyDef>();
+            if (AllProperties == null) return;
+
+            foreach (var prop in AllProperties)
+            {
+                if (prop != null && !string.IsNullOrEmpty(prop.PropertyID))
+                {
+                    _propertyMap[prop.PropertyID] = prop;
+                }
+            }
         }
     }
 }

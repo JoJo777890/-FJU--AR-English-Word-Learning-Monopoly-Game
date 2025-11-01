@@ -2,21 +2,19 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
-    public enum PropertyType { Normal, Utility, Railroad, Special }
-
-    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Def")]
+    /// <summary>
+    /// Defines a single property.
+    /// Create one from 'Assets > Create > AR Monopoly > Property Definition'.
+    /// </summary>
+    [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Definition")]
     public class PropertyDef : ScriptableObject
     {
-        [Header("Identity")]
-        public string PropertyID; // A stable, unique ID like "PROP_ boardwalk"
+        [Tooltip("Unique ID, e.g., 'BOARDWALK'. Must match ID in BoardDefinition.")]
+        public string PropertyID;
         public string DisplayName;
-        public PropertyType Type = PropertyType.Normal;
-
-        [Header("Economy")]
-        public int Price = 0;
-        public int BaseRent = 0;
-        // You could expand this later with:
-        // public int[] RentTiers;
-        // public string ColorSet;
+        public int Price;
+        public int BaseRent;
+        // Future: public int[] RentTiers;
+        // Future: public string ColorGroup;
     }
 }

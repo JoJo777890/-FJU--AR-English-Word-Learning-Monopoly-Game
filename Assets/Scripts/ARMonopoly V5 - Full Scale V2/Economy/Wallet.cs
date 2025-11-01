@@ -1,45 +1,45 @@
 using ARMonopoly_V5___Full_Scale_V2.Core;
-using ARMonopoly_V5___Full_Scale_V2.Player;
-using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Economy
 {
     /// <summary>
-    /// Attached to each PlayerTag GameObject. Holds their money.
+    /// A service class (not a MonoBehaviour) that holds a single player's money.
     /// </summary>
-    public class Wallet : MonoBehaviour
+    public class Wallet
     {
-        private int _balance;
-        private PlayerTag _player;
+        public int PlayerID { get; private set; }
+        public int Money { get; private set; }
 
-        void Awake()
+        public Wallet(int playerID, int startingMoney)
         {
-            _player = GetComponent<PlayerTag>();
-            if (_player == null)
-            {
-                Debug.LogError("Wallet component requires a PlayerTag component on the same GameObject.");
-            }
+            PlayerID = playerID;
+            Money = startingMoney;
         }
 
-        public int GetBalance() => _balance;
-
-        public void SetBalance(int newBalance)
-        {
-            _balance = newBalance;
-            GameEvents.RaiseMoneyChanged(_player.PlayerID, _balance);
-        }
+        public int GetBalance() => Money;
 
         public bool Add(int amount)
         {
             if (amount < 0) return false;
-            SetBalance(_balance + amount);
+            Money += amount;
+            GameEvents.RaiseMoneyChanged(PlayerID, Money);
             return true;
         }
 
         public bool Remove(int amount)
         {
-            if (amount < 0 || _balance < amount) return false;
-            SetBalance(_balance - amount);
+            if (amount < 0) return false;
+            if (Money < amount)
+            {
+                // Not enough money, but we'll allow it for now
+                // (or return false;)
+                Money -= amount;
+                GameEvents.RaiseMoneyChanged(PlayerID, Money);
+                return true; // Or false, depending on game rules
+            }
+
+            Money -= amount;
+            GameEvents.RaiseMoneyChanged(PlayerID, Money);
             return true;
         }
     }

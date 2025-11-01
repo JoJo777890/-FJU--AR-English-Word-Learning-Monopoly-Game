@@ -1,3 +1,4 @@
+using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
@@ -6,150 +7,176 @@ using UnityEngine;
 namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 {
     /// <summary>
-    /// Listens for game events (like landing) and applies rules.
-    /// This is the core "logic" of the game.
+    /// Listens for game events (like landing) and applies game rules.
+    /// Attached to the [GameSystems] GameObject.
     /// </summary>
     public class RuleEngine : MonoBehaviour
     {
-        private AppGame _app;
         private Bank _bank;
-        private RentCalculator _rentCalc;
+        private BoardDefinition _board;
+        private RentCalculator _rentCalculator;
+        private GameStateMachine _stateMachine;
         private TurnController _turnController;
 
-        // State to track if a turn's landing has been resolved
-        private bool _turnResolved = false;
-
-        void Start()
+        // Use Awake for safe reference gathering
+        private void Awake()
         {
-            _app = AppGame.Instance;
-            _bank = _app.Bank;
-            _rentCalc = _app.RentCalculator;
-            _turnController = FindObjectOfType<TurnController>();
+            _bank = AppGame.Instance.Bank;
+            _board = AppGame.Instance.Board;
+            _rentCalculator = AppGame.Instance.RentCalculator;
+            _stateMachine = AppGame.Instance.StateMachine;
+            
+            // This component depends on the TurnController
+            _turnController = GetComponent<TurnController>();
+
+            if (_bank == null || _board == null || _rentCalculator == null || _stateMachine == null || _turnController == null)
+            {
+                Debug.LogError("RuleEngine: Missing one or more critical references from AppGame or GameObject!");
+            }
         }
 
-        void OnEnable()
+        // Use OnEnable/OnDisable for event subscriptions
+        private void OnEnable()
         {
             GameEvents.OnProximityEnter += HandleProximityEnter;
-            GameEvents.OnBuyRequested += HandleBuyRequest;
-            GameEvents.OnTurnStarted += OnTurnStarted;
+            GameEvents.OnBuyRequest += HandleBuyRequest;
+            GameEvents.OnPlayerPassedGo += HandlePassedGo;
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             GameEvents.OnProximityEnter -= HandleProximityEnter;
-            GameEvents.OnBuyRequested -= HandleBuyRequest;
-            GameEvents.OnTurnStarted -= OnTurnStarted;
+            GameEvents.OnBuyRequest -= HandleBuyRequest;
+            GameEvents.OnPlayerPassedGo -= HandlePassedGo;
         }
 
-        void OnTurnStarted(int playerID)
+        private void HandlePassedGo(int playerID)
         {
-            // Reset the resolution flag for the new turn
-            _turnResolved = false;
-        }
-
-        void HandleProximityEnter(ProximityPayload payload)
-        {
-            // Only process the *first* landing event of a turn
-            if (_turnResolved) return;
-            
-            // Only process if it's the current player
-            if (payload.PlayerID != _turnController.GetCurrentPlayerID()) return;
-
-            // Mark turn as resolved so we don't process another landing
-            _turnResolved = true;
-            _app.StateMachine.SetState(GameState.ResolvingTurn);
-
-            var property = payload.PropertyDef;
-            if (property == null)
+            int passGoMoney = AppGame.Instance.Config.PassGoMoney;
+            Wallet wallet = _bank.GetWallet(playerID);
+            if (wallet != null)
             {
-                AdvanceTurn(); // Landed on invalid space
-                return;
-            }
-
-            int ownerID = _app.GetPropertyOwner(property.PropertyID);
-            
-            if (ownerID == -1) // Unowned
-            {
-                // Check if player can afford it
-                if (_app.GetWallet(payload.PlayerID).GetBalance() >= property.Price)
-                {
-                    GameEvents.RaiseBuyPrompt(new BuyPromptPayload
-                    {
-                        PlayerID = payload.PlayerID,
-                        PropertyID = property.PropertyID,
-                        DisplayName = property.DisplayName,
-                        Price = property.Price
-                    });
-                    // The UI will either call HandleBuyRequest or the player might "pass"
-                    // We need a "Pass" button in the UI that calls AdvanceTurn()
-                }
-                else
-                {
-                    GameEvents.RaiseNotify($"Player {payload.PlayerID} cannot afford {property.DisplayName}.");
-                    AdvanceTurn();
-                }
-            }
-            else if (ownerID == payload.PlayerID) // Landed on own property
-            {
-                GameEvents.RaiseNotify($"Player {payload.PlayerID} landed on their own property: {property.DisplayName}.");
-                AdvanceTurn();
-            }
-            else // Landed on someone else's property
-            {
-                HandleRent(payload.PlayerID, ownerID, property);
-                AdvanceTurn();
-            }
-        }
-
-        void HandleBuyRequest(BuyRequestPayload payload)
-        {
-            // Ensure the state is correct (i.e., we are resolving a turn)
-            if (_app.StateMachine.CurrentState != GameState.ResolvingTurn) return;
-
-            var property = _app.PropertyDB.GetProperty(payload.PropertyID);
-            if (property == null) return;
-
-            Wallet buyerWallet = _app.GetWallet(payload.PlayerID);
-            
-            if (_bank.Pay(buyerWallet, property.Price))
-            {
-                _app.SetPropertyOwner(property.PropertyID, payload.PlayerID);
-                GameEvents.RaisePropertyBought(new PropertyBoughtPayload
-                {
-                    PlayerID = payload.PlayerID,
-                    PropertyID = property.PropertyID,
-                    Price = property.Price
-                });
-                GameEvents.RaiseNotify($"Player {payload.PlayerID} bought {property.DisplayName}!");
-            }
-            
-            // Whether they bought it or not, the turn is resolved.
-            AdvanceTurn();
-        }
-
-        void HandleRent(int payerID, int ownerID, PropertyDef property)
-        {
-            int rent = _rentCalc.CalculateRent(property);
-            Wallet payerWallet = _app.GetWallet(payerID);
-            Wallet ownerWallet = _app.GetWallet(ownerID);
-
-            if (_bank.Transfer(payerWallet, ownerWallet, rent))
-            {
-                GameEvents.RaiseNotify($"Player {payerID} paid ${rent} rent to Player {ownerID} for {property.DisplayName}.");
+                wallet.Add(passGoMoney);
+                Debug.Log($"Player {playerID} passed Go, credited ${passGoMoney}");
             }
             else
             {
-                GameEvents.RaiseNotify($"Player {payerID} cannot afford ${rent} rent for {property.DisplayName}!");
-                // Here you would implement bankruptcy logic
+                 Debug.LogWarning($"RuleEngine: Could not find wallet for Player {playerID} to credit Pass Go money.");
             }
         }
-        
-        // Call this when a turn's action is complete
-        public void AdvanceTurn()
+
+        private void HandleProximityEnter(ProximityPayload payload)
         {
-            // TODO: Check for doubles rule. If doubles, don't advance.
-            // For now, we always advance.
-            _turnController.AdvanceToNextPlayer();
+            // 1. Is the game waiting for this move?
+            if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
+
+            // 2. Is it the correct player?
+            if (payload.PlayerID != _turnController.CurrentPlayerID) return;
+
+            // 3. Is it the correct destination?
+            if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID)
+            {
+                Debug.Log($"Player {payload.PlayerID} landed on {payload.PropertyID}, but we are waiting for {AppGame.Instance.ExpectedDestinationPropertyID}");
+                return;
+            }
+
+            // --- SUCCESS ---
+            Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}. Resolving space.");
+            
+            // Change state to show we are resolving
+            _stateMachine.SetState(GameState.ResolvingSpace);
+            
+            // Get the landed property's data
+            PropertyDef landedProp = _board.GetPropertyAt(_board.GetIndexFromID(payload.PropertyID));
+            if (landedProp == null)
+            {
+                Debug.LogError($"Could not find PropertyDef for ID {payload.PropertyID}");
+                _turnController.EndTurn(); // Failsafe
+                return;
+            }
+
+            // 4. Resolve the landing (Buy / Rent / etc.)
+            int ownerID = _bank.GetPropertyOwner(landedProp.PropertyID);
+
+            if (ownerID == -1)
+            {
+                // Unowned. Prompt to buy.
+                GameEvents.RaiseBuyPrompt(new BuyPayload
+                {
+                    PlayerID = payload.PlayerID,
+                    PropertyID = landedProp.PropertyID,
+                    PropertyName = landedProp.DisplayName,
+                    Price = landedProp.Price // <-- FIXED: Was PricePrice
+                });
+                // The UIManager will now show the Buy Panel.
+                // The turn will end when the player clicks "Buy" or "Pass".
+            }
+            else if (ownerID == payload.PlayerID)
+            {
+                // Landed on their own property. Do nothing.
+                Debug.Log($"Player {payload.PlayerID} landed on their own property.");
+                _turnController.EndTurn();
+            }
+            else
+            {
+                // Landed on someone else's property. Pay rent.
+                int rentAmount = _rentCalculator.CalculateRent(landedProp);
+                bool success = _bank.TransferRent(payload.PlayerID, ownerID, rentAmount);
+
+                if (success)
+                {
+                    GameEvents.RaiseRentPaid(new RentPayload
+                    {
+                        PayerID = payload.PlayerID,
+                        OwnerID = ownerID,
+                        PropertyID = landedProp.PropertyID,
+                        PropertyName = landedProp.DisplayName,
+                        Amount = rentAmount
+                    });
+                }
+                else
+                {
+                    Debug.LogWarning($"Player {payload.PlayerID} could not afford rent!");
+                    // (Future) Implement bankruptcy logic here
+                }
+                _turnController.EndTurn();
+            }
+        }
+
+        private void HandleBuyRequest(string propertyID)
+        {
+            // Only process buy requests if we are in the ResolvingSpace state
+            if (_stateMachine.CurrentState != GameState.ResolvingSpace) return;
+            
+            int playerID = _turnController.CurrentPlayerID;
+            PropertyDef propToBuy = AppGame.Instance.PropertyDB.GetProperty(propertyID);
+
+            if (propToBuy == null)
+            {
+                Debug.LogError($"RuleEngine: Could not find PropertyDef for {propertyID} to buy.");
+                _turnController.EndTurn();
+                return;
+            }
+            
+            bool success = _bank.BuyProperty(playerID, propToBuy);
+
+            if (success)
+            {
+                GameEvents.RaisePropertyBought(new PropertyPayload
+                {
+                    PlayerID = playerID,
+                    PropertyID = propToBuy.PropertyID,
+                    PropertyName = propToBuy.DisplayName
+                });
+            }
+            else
+            {
+                Debug.Log($"Player {playerID} failed to buy {propToBuy.DisplayName}. (Not enough money or already owned)");
+            }
+
+            // Whether buy succeeded or failed, the action is resolved. End the turn.
+            _turnController.EndTurn();
         }
     }
 }
+
