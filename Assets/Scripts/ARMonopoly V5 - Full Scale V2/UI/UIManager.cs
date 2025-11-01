@@ -4,6 +4,7 @@ using ARMonopoly_V5___Full_Scale_V2.Economy;
 using ARMonopoly_V5___Full_Scale_V2.Gameplay;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ARMonopoly_V5___Full_Scale_V2.UI
@@ -25,8 +26,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         public Button BuyButton_Confirm;
         public Button BuyButton_Pass;
 
-        [Header("Move Panel")]
-        public TextMeshProUGUI MoveNotificationText;
+        [FormerlySerializedAs("MoveNotificationText")] [Header("Move Panel")]
+        public TextMeshProUGUI NotificationText;
 
         [Header("Log")]
         public TextMeshProUGUI LogText;
@@ -46,7 +47,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
             // Initial UI state
             if(BuyPanel) BuyPanel.SetActive(false);
-            if(MoveNotificationPanel) MoveNotificationPanel.SetActive(false);
+            // if(MoveNotificationPanel) MoveNotificationPanel.SetActive(false);          <--- Notification should be always visible, so I commented this out.
             if(DiceRollText) DiceRollText.text = "";
         }
 
@@ -120,8 +121,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             if(RollButton)
                 RollButton.interactable = (newState == GameState.PlayerTurn);
             
-            if(MoveNotificationPanel)
-                MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);
+            // if(MoveNotificationPanel)
+            //     MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);          <--- Notification should be always visible, so I commented this out.
 
             // Only show buy panel if we are in the resolving state AND a buy prompt is active
             if(BuyPanel)
@@ -130,6 +131,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void HandleTurnStarted(int playerID)
         {
+            if(NotificationText) //                                                     <--- I added this message.
+                NotificationText.text = $"Player {playerID}, please roll the dice!"; //         <--- I added this message.
             if(TurnText)
                 TurnText.text = $"Player {playerID}'s Turn";
             if(DiceRollText)
@@ -145,8 +148,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void HandleMoveRequired(MovePayload payload)
         {
-            if(MoveNotificationText)
-                MoveNotificationText.text = $"Player {payload.PlayerID}, please move your token to:\n{payload.DestinationName}";
+            if(NotificationText)
+                NotificationText.text = $"Player {payload.PlayerID}, please move your token to:\n{payload.DestinationName}";
             AddLog($"Waiting for Player {payload.PlayerID} to move to {payload.DestinationName}.");
         }
 
@@ -180,7 +183,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             _isBuyPromptActive = false;
             if(BuyPanel) BuyPanel.SetActive(false);
             GameEvents.RaiseBuyRequest(_pendingBuyPropertyID);
-            AddLog($"Player purchasing {_pendingBuyPropertyID}.");
+            // AddLog($"Player purchasing {_pendingBuyPropertyID}.");
         }
 
         private void OnBuyPass()
