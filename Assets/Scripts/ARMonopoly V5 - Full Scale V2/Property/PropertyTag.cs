@@ -1,3 +1,4 @@
+using ARMonopoly_V5___Full_Scale_V2.Core; // ADDED THIS
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using UnityEngine;
 
@@ -13,5 +14,23 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
 
         // Helper property to ensure scripts always get the ID
         public string PropertyID => PropertyDefinition != null ? PropertyDefinition.PropertyID : "";
+
+        // **FIXED: Register this property with AppGame's central list**
+        private void Start()
+        {
+            if (AppGame.Instance != null)
+            {
+                AppGame.Instance.AllSceneProperties.Add(this);
+            }
+            else
+            {
+                Debug.LogError($"PropertyTag ({name}): Could not find AppGame to register with!");
+            }
+
+            if (PropertyDefinition == null)
+            {
+                Debug.LogError($"PropertyTag ({name}) is missing its PropertyDefinition asset!", this);
+            }
+        }
     }
 }

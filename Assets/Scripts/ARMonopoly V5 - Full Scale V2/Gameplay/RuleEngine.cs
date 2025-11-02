@@ -76,10 +76,20 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private void HandleProximityEnter(ProximityPayload payload)
         {
             // 1. Is the game waiting for this move?
-            if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
+            if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove)
+            {
+                // **DEBUG LOG ADDED**
+                Debug.Log($"[RuleEngine] Ignored proximity: State is {_stateMachine.CurrentState}, not AwaitingPlayerMove.");
+                return;
+            }
 
             // 2. Is it the correct player?
-            if (payload.PlayerID != _turnController.CurrentPlayerID) return;
+            if (payload.PlayerID != _turnController.CurrentPlayerID)
+            {
+                // **DEBUG LOG ADDED**
+                Debug.Log($"[RuleEngine] Ignored proximity: Wrong player. Got {payload.PlayerID}, expected {_turnController.CurrentPlayerID}.");
+                return;
+            }
 
             // 3. Is it the correct destination?
             if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID)
@@ -180,6 +190,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 if (_currentQuiz.IsBuyQuiz)
                 {
                     // Player answered correctly. NOW they can buy.
+                    // **LOGIC FIX:** We set state to ResolvingSpace so buttons work
+                    _stateMachine.SetState(GameState.ResolvingSpace);
                     GameEvents.RaiseBuyPrompt(new BuyPayload
                     {
                         PlayerID = playerID,
@@ -236,8 +248,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         /// </summary>
         private void HandleBuyRequest(string propertyID)
         {
-            // FIXED: Check for ResolvingSpelling state
-            if (_stateMachine.CurrentState != GameState.ResolvingSpelling) return;
+            // **LOGIC FIX:** This must check for ResolvingSpace
+            if (_stateMachine.CurrentState != GameState.ResolvingSpace) return;
             
             int playerID = _turnController.CurrentPlayerID;
             PropertyDef propToBuy = _board.GetPropertyAt(_board.GetIndexFromID(propertyID));
@@ -261,8 +273,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         /// </summary>
         private void HandlePassRequest(string propertyID)
         {
-            // FIXED: Check for ResolvingSpelling state
-            if (_stateMachine.CurrentState != GameState.ResolvingSpelling) return;
+            // **LOGIC FIX:** This must check for ResolvingSpace
+            if (_stateMachine.CurrentState != GameState.ResolvingSpace) return;
 
             Debug.Log($"Player {_turnController.CurrentPlayerID} passed on buying {propertyID}.");
             _turnController.EndTurn();
@@ -282,8 +294,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     PropertyName = landedProp.DisplayName,
                     Price = landedProp.Price
                 });
-                // Set state to ResolvingSpelling so Buy/Pass buttons work
-                _stateMachine.SetState(GameState.ResolvingSpelling);
+                // Set state to ResolvingSpace so Buy/Pass buttons work
+                _stateMachine.SetState(GameState.ResolvingSpace);
             }
             else if (ownerID != playerID)
             {

@@ -2,7 +2,9 @@ using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
 using ARMonopoly_V5___Full_Scale_V2.Gameplay;
+using ARMonopoly_V5___Full_Scale_V2.Property; // ADDED THIS
 using ARMonopoly_V5___Full_Scale_V2.Spelling;
+using System.Collections.Generic; // ADDED THIS
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
@@ -20,18 +22,21 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public PropertyDatabase PropertyDB;
         public BoardDefinition Board;
         public RentCalculator RentCalculator;
-        public SpellingQuestionDatabase SpellingDB; // NEW
+        public SpellingQuestionDatabase SpellingDB;
 
         [Header("Scene References")]
-        public ARCrosswordScanner CrosswordScanner; // NEW: Assign this in Inspector
+        public ARCrosswordScanner CrosswordScanner;
 
         // Services
         public GameStateMachine StateMachine { get; private set; }
         public Bank Bank { get; private set; }
-        public InvestmentService Investments { get; private set; } // NEW
+        public InvestmentService Investments { get; private set; }
+
+        // **FIXED: Central list to solve dependency bug**
+        [Header("Runtime Lists")]
+        public List<PropertyTag> AllSceneProperties = new List<PropertyTag>();
 
         // Runtime State
-        // The destination the current player is expected to move to.
         public string ExpectedDestinationPropertyID { get; set; }
 
         private void Awake()
@@ -46,12 +51,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
             // Initialize core systems
             StateMachine = new GameStateMachine();
             Bank = new Bank();
-            Investments = new InvestmentService(Bank, Config); // Create new service
+            Investments = new InvestmentService(Bank, Config);
         }
 
         private void Start()
         {
-            // Find the scanner if not assigned
             if (CrosswordScanner == null)
             {
                 CrosswordScanner = FindObjectOfType<ARCrosswordScanner>();

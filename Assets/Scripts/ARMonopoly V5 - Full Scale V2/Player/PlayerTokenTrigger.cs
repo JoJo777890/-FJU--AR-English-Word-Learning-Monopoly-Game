@@ -14,7 +14,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
     [RequireComponent(typeof(PlayerTag), typeof(ObserverBehaviour))]
     public class PlayerTokenTrigger : MonoBehaviour
     {
-        public List<PropertyTag> AllProperties = new List<PropertyTag>();
+        // **FIXED: Now gets list from AppGame, no FindObjectsOfType**
+        private List<PropertyTag> _allProperties;
 
         private PlayerTag _playerTag;
         private ObserverBehaviour _playerObserver;
@@ -27,13 +28,24 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         {
             _playerTag = GetComponent<PlayerTag>();
             _playerObserver = GetComponent<ObserverBehaviour>();
-            _config = AppGame.Instance.Config;
 
-            // Find all properties in the scene
-            AllProperties.AddRange(FindObjectsOfType<PropertyTag>());
+            // **FIXED: Get config and property list from AppGame**
+            if (AppGame.Instance == null)
+            {
+                Debug.LogError($"PlayerTokenTrigger (P{_playerTag.PlayerID}): AppGame.Instance is null!");
+                return;
+            }
+            _config = AppGame.Instance.Config;
+            
+            _allProperties = AppGame.Instance.AllSceneProperties;
+            if (_allProperties == null || _allProperties.Count == 0)
+            {
+                Debug.LogError($"PlayerTokenTrigger (P{_playerTag.PlayerID}): Could not get property list from AppGame. Is AppGame's list populated by PropertyTags?");
+                return;
+            }
             
             // Initialize proximity tracking
-            foreach (var prop in AllProperties)
+            foreach (var prop in _allProperties)
             {
                 if (prop != null && !string.IsNullOrEmpty(prop.PropertyID))
                 {
@@ -44,7 +56,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
 
         void Update()
         {
-            if (_playerObserver == null || _config == null) return;
+            if (_playerObserver == null || _config == null || _allProperties == null) return;
 
             // Only run proximity checks if this player's target is being tracked
             if (_playerObserver.TargetStatus.Status < Status.TRACKED)
@@ -52,14 +64,21 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
                 return;
             }
 
-            foreach (var prop in AllProperties)
+            foreach (var prop in _allProperties)
             {
                 if (prop == null || prop.gameObject == null) continue;
 
+                // **FIXED: Added checks for safety**
+                string propID = prop.PropertyID;
+                if (string.IsNullOrEmpty(propID) || !_isCloseTo.ContainsKey(propID))
+                {
+                    // This can happen if a PropertyTag hasn't registered yet or has no PropertyDef
+                    continue; 
+                }
+
                 float distance = Vector3.Distance(transform.position, prop.transform.position);
                 bool isClose = distance < _config.ProximityTriggerDistance;
-                string propID = prop.PropertyID;
-
+                
                 // Use Hysteresis (Enter/Exit)
                 bool wasClose = _isCloseTo[propID];
 

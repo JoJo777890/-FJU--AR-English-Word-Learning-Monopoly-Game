@@ -3,7 +3,6 @@ using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Player;
-// FIXED: Using .Scene namespace
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
@@ -123,4 +122,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         }
     }
 }
-

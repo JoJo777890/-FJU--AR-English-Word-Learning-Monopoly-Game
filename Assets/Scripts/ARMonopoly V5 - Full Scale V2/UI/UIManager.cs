@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Gameplay;
-// FIXED: Using .Scene namespace
+// FIXED: Using .Player namespace to match user's file
+using ARMonopoly_V5___Full_Scale_V2.Player;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -45,17 +46,15 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         public TextMeshProUGUI LogText;
 
         private string _buyPropertyID; // Store ID for buy/pass
-        private TurnController _turnController; // FIXED: Cached reference
+        private TurnController _turnController;
 
         private void Awake()
         {
-            // FIXED: Get reference once
-            _turnController = FindObjectOfType<TurnController>(); 
+            _turnController = FindObjectOfType<TurnController>();
             
             // Wire up button clicks
-            RollButton.onClick.AddListener(() => {
-                // The RollButton script will handle this
-            });
+            // **FIXED: Removed the empty RollButton listener.**
+            // The RollButton.cs script handles its own click event.
             
             BuyButton_Confirm.onClick.AddListener(() => {
                 GameEvents.RaiseBuyRequest(_buyPropertyID);
@@ -67,14 +66,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                 BuyPanel.SetActive(false);
             });
             
-            // --- NEW QUIZ BUTTONS ---
             InvestButton.onClick.AddListener(() => {
-                // Find the next player who ISN'T the current player
                 int currentPlayer = _turnController.CurrentPlayerID;
-                
-                // Simple 2-player toggle. This will need to be smarter for 3+ players.
                 int nextPlayer = (currentPlayer == 1) ? 2 : 1; 
-                
                 GameEvents.RaiseInvestRequest(new InvestRequest { PlayerID = nextPlayer });
             });
 
@@ -95,6 +89,22 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             QuizResultPanel.SetActive(false);
         }
 
+        // **FIXED: ADDED START() TO FIX RACE CONDITION**
+        private void Start()
+        {
+            // Manually sync UI to the current game state when UIManager starts.
+            // This prevents a race condition where TurnController sets the state
+            // *before* UIManager has subscribed to the event.
+            if (AppGame.Instance != null && AppGame.Instance.StateMachine != null)
+            {
+                HandleStateChanged(AppGame.Instance.StateMachine.CurrentState);
+            }
+            else
+            {
+                Debug.LogError("UIManager: Could not sync to initial state. AppGame or StateMachine is null.");
+            }
+        }
+
         private void OnEnable()
         {
             GameEvents.OnStateChanged += HandleStateChanged;
@@ -106,7 +116,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             GameEvents.OnRentPaid += HandleRentPaid;
             GameEvents.OnPropertyBought += HandlePropertyBought;
             
-            // --- NEW QUIZ EVENTS ---
             GameEvents.OnSpellingQuizStarted += HandleSpellingQuizStarted;
             GameEvents.OnPlayerInvested += HandlePlayerInvested;
             GameEvents.OnQuizResult += HandleQuizResult;
@@ -123,7 +132,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             GameEvents.OnRentPaid -= HandleRentPaid;
             GameEvents.OnPropertyBought -= HandlePropertyBought;
             
-            // --- NEW QUIZ EVENTS ---
             GameEvents.OnSpellingQuizStarted -= HandleSpellingQuizStarted;
             GameEvents.OnPlayerInvested -= HandlePlayerInvested;
             GameEvents.OnQuizResult -= HandleQuizResult;
@@ -131,18 +139,16 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         
         private void HandleStateChanged(GameState newState)
         {
-            // Only allow rolling in the PlayerTurn state
             RollButton.interactable = (newState == GameState.PlayerTurn);
             
-            // Hide panels based on state
             if (newState != GameState.AwaitingPlayerMove)
                 MoveNotificationPanel.SetActive(false);
             
             if (newState != GameState.AwaitingSpelling)
                 SpellingQuizPanel.SetActive(false);
                 
-            // BuyPanel is shown by OnBuyPrompt, which happens *after* ResolvingSpelling
-            if (newState != GameState.ResolvingSpelling)
+            // **FIXED:** Check for the correct state
+            if (newState != GameState.ResolvingSpace)
                 BuyPanel.SetActive(false);
         }
 
@@ -173,22 +179,18 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void HandleMoneyChanged(int playerID, int newBalance)
         {
-            int index = playerID - 1; // Assuming P1=index 0, P2=index 1
+            int index = playerID - 1;
             if (index >= 0 && index < MoneyTexts.Count)
             {
                 MoneyTexts[index].text = $"P{playerID}: ${newBalance}";
             }
         }
         
-        // --- NEW HANDLERS ---
-        
         private void HandleSpellingQuizStarted(SpellingQuizPayload payload)
         {
             SpellingQuizPanel.SetActive(true);
             SpellingQuestionText.text = payload.Question.QuestionText;
             
-            // Update the Invest button
-            // This assumes 2 players. A real system would be more complex.
             int currentPlayer = payload.PlayerID;
             int otherPlayer = (currentPlayer == 1) ? 2 : 1;
             int chances = AppGame.Instance.Investments.GetChancesLeft(otherPlayer);
@@ -196,14 +198,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             InvestButtonText.text = $"P{otherPlayer}: Invest? ({chances} left)";
             InvestButton.interactable = (chances > 0);
             
-            // Only the current player can check the answer
             CheckAnswerButton.gameObject.SetActive(true); 
         }
 
         private void HandlePlayerInvested(int playerID, string propertyName, int amount)
         {
             AddLog($"Player {playerID} invested ${amount} in {propertyName}!");
-            // Update the button text to show they've invested
             InvestButtonText.text = $"P{playerID} Invested!";
             InvestButton.interactable = false;
         }
@@ -216,8 +216,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             AddLog($"{payload.Title} {payload.Message}");
         }
         
-        // --- LOG HANDLERS ---
-
         private void HandleRentPaid(RentPayload payload)
         {
             AddLog($"Player {payload.PayerID} paid ${payload.Amount} rent to Player {payload.OwnerID} for {payload.PropertyName}.");
@@ -232,7 +230,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         {
             if (LogText == null) return;
             LogText.text = message + "\n" + LogText.text;
-            if (LogText.text.Length > 1000) // Prune log
+            if (LogText.text.Length > 1000)
             {
                 LogText.text = LogText.text.Substring(0, 1000);
             }

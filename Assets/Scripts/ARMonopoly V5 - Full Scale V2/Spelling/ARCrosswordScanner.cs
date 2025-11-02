@@ -138,6 +138,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
                 }
                 if (!added)
                 {
+                    // **BUG FIX 1: Was adding List<List<...>>**
                     columns.Add(new List<TrackedLetter> { letter });
                 }
             }
@@ -145,6 +146,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
             columns.Sort((a, b) => a[0].position.x.CompareTo(b[0].position.x));
             foreach (var col in columns)
             {
+                // **BUG FIX 2: Was `a[0].position.y`**
                 col.Sort((a, b) => b.position.y.CompareTo(a.position.y));
             }
 

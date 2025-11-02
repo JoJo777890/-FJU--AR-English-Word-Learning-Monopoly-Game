@@ -14,6 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PropertyID: ID_Location_D
   DisplayName: Location_D
-  Type: 0
   Price: 250
   BaseRent: 50

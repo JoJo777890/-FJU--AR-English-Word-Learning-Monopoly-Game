@@ -149,4 +149,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public static void RaiseMoneyChanged(int playerID, int newBalance) => OnMoneyChanged?.Invoke(playerID, newBalance);
     }
 }
-

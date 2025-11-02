@@ -26,6 +26,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
         {
             _config = AppGame.Instance.Config;
             _propertyID = GetComponent<PropertyTag>().PropertyID;
+
+            if (_config == null)
+            {
+                Debug.LogError($"PropertyVisuals ({name}): Could not get GameConfig from AppGame!");
+                return;
+            }
             
             // Find all content children and cache their base scales
             foreach (Transform child in transform)
@@ -92,4 +98,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
         }
     }
 }
-

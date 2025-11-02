@@ -2,7 +2,7 @@ using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using UnityEngine;
 
-namespace ARMonopoly_V5___Full_Scale_V2.Player // FIXED: Standardized namespace
+namespace ARMonopoly_V5___Full_Scale_V2.Player
 {
     /// <summary>
     /// Attached to the Player's Image Target.
@@ -40,7 +40,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player // FIXED: Standardized namespace
                 Debug.LogError($"PlayerTag {PlayerID}: Could not find Bank to register with!", this);
             }
 
-            // --- 2. REGISTER WITH INVESTMENT SERVICE --- (NEW)
+            // --- 2. REGISTER WITH INVESTMENT SERVICE ---
             if (AppGame.Instance.Investments != null)
             {
                 AppGame.Instance.Investments.RegisterPlayer(PlayerID);
@@ -50,7 +50,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player // FIXED: Standardized namespace
             // --- 3. SET STARTING POSITION ---
             if (StartingProperty != null)
             {
-                // Try to find the starting index from the BoardDefinition
                 int startIndex = AppGame.Instance.Board.GetIndexFromID(StartingProperty.PropertyID);
                 if (startIndex != -1)
                 {
@@ -70,4 +69,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player // FIXED: Standardized namespace
         }
     }
 }
-
