@@ -1,15 +1,16 @@
+// In folder: ARMonopoly V5 - Full Scale V2/Core/
 using System;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
 {
-    // This enum defines the central state of the game.
-    // It is defined here so all other scripts can reference it.
     public enum GameState
     {
         Boot,
-        PlayerTurn,         // Waiting for player to click "Roll"
-        AwaitingPlayerMove, // Player has rolled, waiting for physical move
-        ResolvingSpace      // Player has landed, RuleEngine is resolving (e.g., show Buy panel)
+        PlayerTurn,
+        AwaitingPlayerMove,
+        ResolvingSpace,
+        AwaitingSpellingAnswer, // New State
+        ResolvingSpelling      // New State
     }
 
     public static class GameEvents
@@ -37,6 +38,17 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
 
         public static event Action<ProximityPayload> OnProximityExit;
         public static void RaiseProximityExit(ProximityPayload payload) => OnProximityExit?.Invoke(payload);
+        
+        // --- Spelling & Investment ---
+        public static event Action<SpellingQuestionPayload> OnSpellingQuestion;
+        public static void RaiseSpellingQuestion(SpellingQuestionPayload payload) => OnSpellingQuestion?.Invoke(payload);
+
+        public static event Action<InvestmentPayload> OnPlayerInvest;
+        public static void RaisePlayerInvest(InvestmentPayload payload) => OnPlayerInvest?.Invoke(payload);
+
+        public static event Action<SpellingAnswerPayload> OnSpellingAnswer;
+        public static void RaiseSpellingAnswer(SpellingAnswerPayload payload) => OnSpellingAnswer?.Invoke(payload);
+
 
         // --- Rules & Economy ---
         public static event Action<BuyPayload> OnBuyPrompt;
@@ -57,44 +69,17 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
 
     #region Event Payloads
 
-    public struct ProximityPayload
-    {
-        public int PlayerID;
-        public string PropertyID;
-    }
+    public struct ProximityPayload { public int PlayerID; public string PropertyID; }
+    public struct MovePayload { public int PlayerID; public string DestinationName; public string DestinationPropertyID; }
+    public struct BuyPayload { public int PlayerID; public string PropertyID; public string PropertyName; public int Price; }
+    public struct PropertyPayload { public int PlayerID; public string PropertyID; public string PropertyName; public int Price; }
+    public struct RentPayload { public int PayerID; public int OwnerID; public string PropertyID; public string PropertyName; public int Amount; }
+    
+    // --- New Payloads ---
+    public struct SpellingQuestionPayload { public int PlayerID; public Data.SpellingQuestion Question; public string PropertyID; }
+    public struct InvestmentPayload { public int InvestorID; public int TargetPlayerID; public int Amount; }
+    public struct SpellingAnswerPayload { public int PlayerID; public string Answer; }
 
-    public struct MovePayload
-    {
-        public int PlayerID;
-        public string DestinationName;
-        public string DestinationPropertyID;
-    }
-
-    public struct BuyPayload
-    {
-        public int PlayerID;
-        public string PropertyID;
-        public string PropertyName;
-        public int Price; // <-- FIXED: Was PricePrice
-    }
-
-    public struct PropertyPayload
-    {
-        public int PlayerID;
-        public string PropertyID;
-        public string PropertyName;
-        public int Price;
-    }
-
-    public struct RentPayload
-    {
-        public int PayerID;
-        public int OwnerID;
-        public string PropertyID;
-        public string PropertyName;
-        public int Amount;
-    }
 
     #endregion
 }
-

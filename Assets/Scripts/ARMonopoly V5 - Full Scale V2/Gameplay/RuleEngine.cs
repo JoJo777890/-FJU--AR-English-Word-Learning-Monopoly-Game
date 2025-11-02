@@ -1,3 +1,5 @@
+// In folder: ARMonopoly V5 - Full Scale V2/Gameplay/
+using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
@@ -6,10 +8,6 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 {
-    /// <summary>
-    /// Listens for game events (like landing) and applies game rules.
-    /// Attached to the [GameSystems] GameObject.
-    /// </summary>
     public class RuleEngine : MonoBehaviour
     {
         private Bank _bank;
@@ -17,30 +15,31 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private RentCalculator _rentCalculator;
         private GameStateMachine _stateMachine;
         private TurnController _turnController;
+        private SpellingQuestionDatabase _spellingDB;
 
-        // Use Awake for safe reference gathering
+        // Runtime state for the current spelling question
+        private SpellingQuestion _currentQuestion;
+        private string _propertyInQuestionID;
+        private List<int> _investors = new List<int>();
+
+
         private void Awake()
         {
             _bank = AppGame.Instance.Bank;
             _board = AppGame.Instance.Board;
             _rentCalculator = AppGame.Instance.RentCalculator;
             _stateMachine = AppGame.Instance.StateMachine;
-            
-            // This component depends on the TurnController
             _turnController = GetComponent<TurnController>();
-
-            if (_bank == null || _board == null || _rentCalculator == null || _stateMachine == null || _turnController == null)
-            {
-                Debug.LogError("RuleEngine: Missing one or more critical references from AppGame or GameObject!");
-            }
+            _spellingDB = AppGame.Instance.SpellingDB;
         }
 
-        // Use OnEnable/OnDisable for event subscriptions
         private void OnEnable()
         {
             GameEvents.OnProximityEnter += HandleProximityEnter;
             GameEvents.OnBuyRequest += HandleBuyRequest;
             GameEvents.OnPlayerPassedGo += HandlePassedGo;
+            GameEvents.OnPlayerInvest += HandleInvestment;
+            GameEvents.OnSpellingAnswer += HandleSpellingAnswer;
         }
 
         private void OnDisable()
@@ -48,6 +47,135 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             GameEvents.OnProximityEnter -= HandleProximityEnter;
             GameEvents.OnBuyRequest -= HandleBuyRequest;
             GameEvents.OnPlayerPassedGo -= HandlePassedGo;
+            GameEvents.OnPlayerInvest -= HandleInvestment;
+            GameEvents.OnSpellingAnswer -= HandleSpellingAnswer;
+        }
+
+        private void HandleProximityEnter(ProximityPayload payload)
+        {
+            if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
+            if (payload.PlayerID != _turnController.CurrentPlayerID) return;
+            if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID) return;
+
+            Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}. Starting Spelling Round.");
+            _stateMachine.SetState(GameState.AwaitingSpellingAnswer);
+
+            _propertyInQuestionID = payload.PropertyID;
+            _currentQuestion = _spellingDB.GetRandomQuestion();
+            _investors.Clear();
+
+            if (_currentQuestion != null)
+            {
+                GameEvents.RaiseSpellingQuestion(new SpellingQuestionPayload
+                {
+                    PlayerID = payload.PlayerID,
+                    Question = _currentQuestion,
+                    PropertyID = _propertyInQuestionID
+                });
+            }
+            else
+            {
+                Debug.LogError("No spelling questions found in the database! Ending turn.");
+                _turnController.EndTurn();
+            }
+        }
+        
+        private void HandleInvestment(InvestmentPayload payload)
+        {
+            if (_stateMachine.CurrentState != GameState.AwaitingSpellingAnswer) return;
+
+            PropertyDef prop = AppGame.Instance.PropertyDB.GetProperty(_propertyInQuestionID);
+            int investmentAmount = prop.Price / 2;
+
+            if (_bank.GetWallet(payload.InvestorID).GetBalance() >= investmentAmount)
+            {
+                _bank.TakeInvestment(payload.InvestorID, investmentAmount);
+                _investors.Add(payload.InvestorID);
+                Debug.Log($"Player {payload.InvestorID} invested in Player {payload.TargetPlayerID}.");
+            }
+        }
+        
+        private void HandleSpellingAnswer(SpellingAnswerPayload payload)
+        {
+            if (_stateMachine.CurrentState != GameState.AwaitingSpellingAnswer) return;
+            _stateMachine.SetState(GameState.ResolvingSpelling);
+
+            bool isCorrect = payload.Answer.ToUpper() == _currentQuestion.CorrectAnswer.ToUpper();
+            int currentPlayerID = payload.PlayerID;
+            PropertyDef prop = AppGame.Instance.PropertyDB.GetProperty(_propertyInQuestionID);
+
+            if (isCorrect)
+            {
+                Debug.Log($"Player {currentPlayerID} answered correctly!");
+                // Handle rewards for investors
+                foreach (var investorID in _investors)
+                {
+                    _bank.RewardInvestment(investorID, prop.Price / 2);
+                }
+
+                int ownerID = _bank.GetPropertyOwner(prop.PropertyID);
+                if (ownerID == -1) // Unowned property
+                {
+                    // Allow the player to buy
+                    GameEvents.RaiseBuyPrompt(new BuyPayload
+                    {
+                        PlayerID = currentPlayerID, PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, Price = prop.Price
+                    });
+                }
+                else // Owned property
+                {
+                    Debug.Log($"Player {currentPlayerID} answered correctly and waives rent.");
+                    _turnController.EndTurn();
+                }
+            }
+            else
+            {
+                Debug.Log($"Player {currentPlayerID} answered incorrectly.");
+                // Investors lose their money (Bank already has it)
+                Debug.Log($"Investors lost their investment.");
+
+                int ownerID = _bank.GetPropertyOwner(prop.PropertyID);
+                 if (ownerID == -1) // Unowned
+                {
+                    _bank.GetWallet(currentPlayerID).Remove(_currentQuestion.FineAmount);
+                    Debug.Log($"Player {currentPlayerID} was fined ${_currentQuestion.FineAmount}");
+                    _turnController.EndTurn();
+                }
+                else if(ownerID != currentPlayerID) // Owned by someone else
+                {
+                    int rentAmount = _rentCalculator.CalculateRent(prop);
+                    _bank.TransferRent(currentPlayerID, ownerID, rentAmount);
+                    GameEvents.RaiseRentPaid(new RentPayload
+                    {
+                        PayerID = currentPlayerID, OwnerID = ownerID, PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, Amount = rentAmount
+                    });
+                     _turnController.EndTurn();
+                }
+                else // Landed on their own property
+                {
+                    _turnController.EndTurn();
+                }
+            }
+        }
+        
+        private void HandleBuyRequest(string propertyID)
+        {
+            if (_stateMachine.CurrentState != GameState.ResolvingSpelling && _stateMachine.CurrentState != GameState.ResolvingSpace) return;
+            
+            int playerID = _turnController.CurrentPlayerID;
+            PropertyDef propToBuy = AppGame.Instance.PropertyDB.GetProperty(propertyID);
+
+            if (_bank.BuyProperty(playerID, propToBuy))
+            {
+                GameEvents.RaisePropertyBought(new PropertyPayload
+                {
+                    PlayerID = playerID, PropertyID = propToBuy.PropertyID,
+                    PropertyName = propToBuy.DisplayName, Price = propToBuy.Price
+                });
+            }
+            _turnController.EndTurn();
         }
 
         private void HandlePassedGo(int playerID)
@@ -59,125 +187,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 wallet.Add(passGoMoney);
                 Debug.Log($"Player {playerID} passed Go, credited ${passGoMoney}");
             }
-            else
-            {
-                 Debug.LogWarning($"RuleEngine: Could not find wallet for Player {playerID} to credit Pass Go money.");
-            }
-        }
-
-        private void HandleProximityEnter(ProximityPayload payload)
-        {
-            // 1. Is the game waiting for this move?
-            if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
-
-            // 2. Is it the correct player?
-            if (payload.PlayerID != _turnController.CurrentPlayerID) return;
-
-            // 3. Is it the correct destination?
-            if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID)
-            {
-                Debug.Log($"Player {payload.PlayerID} landed on {payload.PropertyID}, but we are waiting for {AppGame.Instance.ExpectedDestinationPropertyID}");
-                return;
-            }
-
-            // --- SUCCESS ---
-            Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}. Resolving space.");
-            
-            // Change state to show we are resolving
-            _stateMachine.SetState(GameState.ResolvingSpace);
-            
-            // Get the landed property's data
-            PropertyDef landedProp = _board.GetPropertyAt(_board.GetIndexFromID(payload.PropertyID));
-            if (landedProp == null)
-            {
-                Debug.LogError($"Could not find PropertyDef for ID {payload.PropertyID}");
-                _turnController.EndTurn(); // Failsafe
-                return;
-            }
-
-            // 4. Resolve the landing (Buy / Rent / etc.)
-            int ownerID = _bank.GetPropertyOwner(landedProp.PropertyID);
-
-            if (ownerID == -1)
-            {
-                // Unowned. Prompt to buy.
-                GameEvents.RaiseBuyPrompt(new BuyPayload
-                {
-                    PlayerID = payload.PlayerID,
-                    PropertyID = landedProp.PropertyID,
-                    PropertyName = landedProp.DisplayName,
-                    Price = landedProp.Price // <-- FIXED: Was PricePrice
-                });
-                // The UIManager will now show the Buy Panel.
-                // The turn will end when the player clicks "Buy" or "Pass".
-            }
-            else if (ownerID == payload.PlayerID)
-            {
-                // Landed on their own property. Do nothing.
-                Debug.Log($"Player {payload.PlayerID} landed on their own property.");
-                _turnController.EndTurn();
-            }
-            else
-            {
-                // Landed on someone else's property. Pay rent.
-                int rentAmount = _rentCalculator.CalculateRent(landedProp);
-                bool success = _bank.TransferRent(payload.PlayerID, ownerID, rentAmount);
-
-                if (success)
-                {
-                    GameEvents.RaiseRentPaid(new RentPayload
-                    {
-                        PayerID = payload.PlayerID,
-                        OwnerID = ownerID,
-                        PropertyID = landedProp.PropertyID,
-                        PropertyName = landedProp.DisplayName,
-                        Amount = rentAmount
-                    });
-                }
-                else
-                {
-                    Debug.LogWarning($"Player {payload.PlayerID} could not afford rent!");
-                    // (Future) Implement bankruptcy logic here
-                }
-                _turnController.EndTurn();
-            }
-        }
-
-        private void HandleBuyRequest(string propertyID)
-        {
-            // Only process buy requests if we are in the ResolvingSpace state
-            if (_stateMachine.CurrentState != GameState.ResolvingSpace) return;
-            
-            int playerID = _turnController.CurrentPlayerID;
-            PropertyDef propToBuy = AppGame.Instance.PropertyDB.GetProperty(propertyID);
-
-            if (propToBuy == null)
-            {
-                Debug.LogError($"RuleEngine: Could not find PropertyDef for {propertyID} to buy.");
-                _turnController.EndTurn();
-                return;
-            }
-            
-            bool success = _bank.BuyProperty(playerID, propToBuy);
-
-            if (success)
-            {
-                GameEvents.RaisePropertyBought(new PropertyPayload
-                {
-                    PlayerID = playerID,
-                    PropertyID = propToBuy.PropertyID,
-                    PropertyName = propToBuy.DisplayName,
-                    Price = propToBuy.Price
-                });
-            }
-            else
-            {
-                Debug.Log($"Player {playerID} failed to buy {propToBuy.DisplayName}. (Not enough money or already owned)");
-            }
-
-            // Whether buy succeeded or failed, the action is resolved. End the turn.
-            _turnController.EndTurn();
         }
     }
 }
-

@@ -1,3 +1,4 @@
+// In folder: ARMonopoly V5 - Full Scale V2/Economy/
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
@@ -5,16 +6,9 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Economy
 {
-    /// <summary>
-    /// A service class (not a MonoBehaviour) that handles all money and property ownership.
-    /// Instantiated and held by AppGame.
-    /// </summary>
     public class Bank
     {
-        // Tracks money for each player
         private Dictionary<int, Wallet> _wallets = new Dictionary<int, Wallet>();
-        
-        // Tracks ownership: <PropertyID, Owner_PlayerID>
         private Dictionary<string, int> _propertyOwners = new Dictionary<string, int>();
 
         public void RegisterPlayer(int playerID, int startingMoney)
@@ -35,7 +29,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         public int GetPropertyOwner(string propertyID)
         {
             _propertyOwners.TryGetValue(propertyID, out int ownerID);
-            return ownerID != 0 ? ownerID : -1; // Return -1 for unowned
+            return ownerID != 0 ? ownerID : -1;
         }
         
         public bool BuyProperty(int playerID, PropertyDef property)
@@ -43,7 +37,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             if (property == null) return false;
             
             int owner = GetPropertyOwner(property.PropertyID);
-            if (owner != -1) return false; // Already owned
+            if (owner != -1) return false;
 
             Wallet payerWallet = GetWallet(playerID);
             if (payerWallet == null) return false;
@@ -56,7 +50,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
                 return true;
             }
             
-            return false; // Not enough money
+            return false;
         }
 
         public bool TransferRent(int payerID, int ownerID, int amount)
@@ -65,17 +59,24 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             Wallet ownerWallet = GetWallet(ownerID);
 
             if (payerWallet == null || ownerWallet == null) return false;
-            
-            // Handle insufficient funds if necessary
-            if (payerWallet.GetBalance() < amount)
-            {
-                // (Future) Bankruptcy logic
-            }
-            
+
             payerWallet.Remove(amount);
             ownerWallet.Add(amount);
             return true;
         }
+        
+        // --- New Investment Methods ---
+        public void TakeInvestment(int investorID, int amount)
+        {
+            GetWallet(investorID)?.Remove(amount);
+        }
+
+        public void RewardInvestment(int investorID, int originalAmount)
+        {
+            // Return original investment + reward
+            int totalReturn = originalAmount + originalAmount; 
+            GetWallet(investorID)?.Add(totalReturn);
+            Debug.Log($"[Bank] Rewarded Player {investorID} with ${totalReturn}.");
+        }
     }
 }
-

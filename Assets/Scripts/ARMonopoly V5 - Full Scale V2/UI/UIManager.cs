@@ -1,10 +1,9 @@
+// In folder: ARMonopoly V5 - Full Scale V2/UI/
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Core;
-using ARMonopoly_V5___Full_Scale_V2.Economy;
 using ARMonopoly_V5___Full_Scale_V2.Gameplay;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace ARMonopoly_V5___Full_Scale_V2.UI
@@ -14,6 +13,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         [Header("State Panels")]
         public GameObject BuyPanel;
         public GameObject MoveNotificationPanel;
+        public GameObject SpellingPanel; // New
 
         [Header("HUD")]
         public Button RollButton;
@@ -26,33 +26,32 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         public Button BuyButton_Confirm;
         public Button BuyButton_Pass;
 
-        [FormerlySerializedAs("MoveNotificationText")] [Header("Move Panel")]
-        public TextMeshProUGUI NotificationText;
+        [Header("Move Panel")]
+        public TextMeshProUGUI MoveNotificationText;
+        
+        [Header("Spelling Panel")] // New
+        public TextMeshProUGUI SpellingQuestionText;
+        public TMP_InputField SpellingAnswerInput;
+        public Button SpellingSubmitButton;
+        public Button[] InvestmentButtons; // Assign buttons for players who can invest
+        
 
         [Header("Log")]
         public TextMeshProUGUI LogText;
 
         private string _pendingBuyPropertyID;
-        private bool _isBuyPromptActive = false;
 
-        // Awake is called once when the script instance is being loaded.
-        // Best for getting references and wiring its own components.
         private void Awake()
         {
-            // Button listeners only need to be set up once.
-            if(BuyButton_Confirm)
-                BuyButton_Confirm.onClick.AddListener(OnBuyConfirm);
-            if(BuyButton_Pass)
-                BuyButton_Pass.onClick.AddListener(OnBuyPass);
+            if(BuyButton_Confirm) BuyButton_Confirm.onClick.AddListener(OnBuyConfirm);
+            if(BuyButton_Pass) BuyButton_Pass.onClick.AddListener(OnBuyPass);
+            if(SpellingSubmitButton) SpellingSubmitButton.onClick.AddListener(OnSpellingSubmit);
 
-            // Initial UI state
-            if(BuyPanel) BuyPanel.SetActive(false);
-            // if(MoveNotificationPanel) MoveNotificationPanel.SetActive(false);          <--- Notification should be always visible, so I commented this out.
-            if(DiceRollText) DiceRollText.text = "";
+            BuyPanel.SetActive(false);
+            MoveNotificationPanel.SetActive(false);
+            SpellingPanel.SetActive(false);
         }
 
-        // OnEnable is called when the object becomes enabled and active.
-        // Best for subscribing to external events.
         private void OnEnable()
         {
             GameEvents.OnStateChanged += HandleStateChanged;
@@ -64,10 +63,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             GameEvents.OnRentPaid += HandleRentPaid;
             GameEvents.OnMoveRequired += HandleMoveRequired;
             GameEvents.OnPlayerPassedGo += OnPlayerPassedGo;
+            GameEvents.OnSpellingQuestion += HandleSpellingQuestion;
         }
 
-        // OnDisable is called when the object becomes disabled.
-        // Best for unsubscribing from external events.
         private void OnDisable()
         {
             GameEvents.OnStateChanged -= HandleStateChanged;
@@ -79,33 +77,57 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             GameEvents.OnRentPaid -= HandleRentPaid;
             GameEvents.OnMoveRequired -= HandleMoveRequired;
             GameEvents.OnPlayerPassedGo -= OnPlayerPassedGo;
+            GameEvents.OnSpellingQuestion -= HandleSpellingQuestion;
         }
 
-        // // Start is called before the first frame update.
-        // // Good for initialization that depends on other objects.
-        // private void Start()
-        // {
-        //     // Initialize Money display after AppGame/Bank are ready.
-        //     InitializeMoneyDisplays();
-        // }
-        //
-        // private void InitializeMoneyDisplays()
-        // {
-        //     if (AppGame.Instance == null || AppGame.Instance.Bank == null)
-        //     {
-        //         Debug.LogWarning("UIManager: AppGame or Bank not ready for money initialization!");
-        //         return;
-        //     }
-        //
-        //     foreach (var playerTag in FindObjectsOfType<Scene.PlayerTag>())
-        //     {
-        //         Wallet wallet = AppGame.Instance.Bank.GetWallet(playerTag.PlayerID);
-        //         if (wallet != null)
-        //             HandleMoneyChanged(playerTag.PlayerID, wallet.Money);
-        //         else
-        //             Debug.LogWarning($"UIManager: Could not find wallet for Player {playerTag.PlayerID} during initialization.");
-        //     }
-        // }
+        private void HandleStateChanged(GameState newState)
+        {
+            RollButton.interactable = (newState == GameState.PlayerTurn);
+            MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);
+            BuyPanel.SetActive(newState == GameState.ResolvingSpace || newState == GameState.ResolvingSpelling);
+            SpellingPanel.SetActive(newState == GameState.AwaitingSpellingAnswer);
+        }
+        
+        private void HandleSpellingQuestion(SpellingQuestionPayload payload)
+        {
+            SpellingQuestionText.text = payload.Question.QuestionText;
+            SpellingAnswerInput.text = "";
+
+            // Configure investment buttons
+            // This is a simple example for a 2-player game. You can expand this logic.
+            TurnController tc = FindObjectOfType<TurnController>();
+            for(int i = 0; i < InvestmentButtons.Length; i++)
+            {
+                int playerID = i + 1; // Assuming player IDs are 1-based
+                if (playerID != tc.CurrentPlayerID)
+                {
+                    InvestmentButtons[i].gameObject.SetActive(true);
+                    InvestmentButtons[i].onClick.RemoveAllListeners();
+                    InvestmentButtons[i].onClick.AddListener(() => {
+                        GameEvents.RaisePlayerInvest(new InvestmentPayload { InvestorID = playerID, TargetPlayerID = tc.CurrentPlayerID });
+                        InvestmentButtons[playerID - 1].gameObject.SetActive(false); // Disable after investing
+                    });
+                }
+                else
+                {
+                    InvestmentButtons[i].gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        private void OnSpellingSubmit()
+        {
+            TurnController tc = FindObjectOfType<TurnController>();
+            GameEvents.RaiseSpellingAnswer(new SpellingAnswerPayload
+            {
+                PlayerID = tc.CurrentPlayerID,
+                Answer = SpellingAnswerInput.text
+            });
+            SpellingPanel.SetActive(false);
+        }
+
+
+        // ... (rest of the UIManager code is the same)
 
         private void OnPlayerPassedGo(int pid)
         {
@@ -115,47 +137,26 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             }
         }
 
-        private void HandleStateChanged(GameState newState)
-        {
-            // Control UI visibility based on state
-            if(RollButton)
-                RollButton.interactable = (newState == GameState.PlayerTurn);
-            
-            // if(MoveNotificationPanel)
-            //     MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);          <--- Notification should be always visible, so I commented this out.
-
-            // Only show buy panel if we are in the resolving state AND a buy prompt is active
-            if(BuyPanel)
-                BuyPanel.SetActive(newState == GameState.ResolvingSpace && _isBuyPromptActive);
-        }
-
         private void HandleTurnStarted(int playerID)
         {
-            if(NotificationText) //                                                     <--- I added this message.
-                NotificationText.text = $"Player {playerID}, please roll the dice!"; //         <--- I added this message.
-            if(TurnText)
-                TurnText.text = $"Player {playerID}'s Turn";
-            if(DiceRollText)
-                DiceRollText.text = "Roll the dice!";
+            TurnText.text = $"Player {playerID}'s Turn";
+            DiceRollText.text = "Roll the dice!";
             AddLog($"Player {playerID}'s turn has started.");
         }
 
         private void HandleDiceRolled(int playerID, int totalRoll)
         {
-            if(DiceRollText)
-                DiceRollText.text = $"Player {playerID} rolled a {totalRoll}!";
+            DiceRollText.text = $"Player {playerID} rolled a {totalRoll}!";
         }
 
         private void HandleMoveRequired(MovePayload payload)
         {
-            if(NotificationText)
-                NotificationText.text = $"Player {payload.PlayerID}, please move your token to:\n{payload.DestinationName}";
+            MoveNotificationText.text = $"Player {payload.PlayerID}, please move to:\n{payload.DestinationName}";
             AddLog($"Waiting for Player {payload.PlayerID} to move to {payload.DestinationName}.");
         }
 
         private void HandleMoneyChanged(int playerID, int newBalance)
         {
-            // Assumes Player 1 is at index 0, Player 2 at index 1, etc.
             int moneyIndex = playerID - 1;
             if (moneyIndex >= 0 && moneyIndex < MoneyTexts.Count)
             {
@@ -167,40 +168,19 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         private void HandleBuyPrompt(BuyPayload payload)
         {
             _pendingBuyPropertyID = payload.PropertyID;
-            _isBuyPromptActive = true;
-            if(BuyPromptText)
-                BuyPromptText.text = $"Player {payload.PlayerID}, buy {payload.PropertyName} for ${payload.Price}?"; // <-- FIXED: Was payload.PricePrice
-
-            // The HandleStateChanged method will now show the panel
-            // because the state is ResolvingSpace and _isBuyPromptActive is true.
-            HandleStateChanged(AppGame.Instance.StateMachine.CurrentState);
+            BuyPromptText.text = $"Player {payload.PlayerID}, buy {payload.PropertyName} for ${payload.Price}?";
         }
 
         private void OnBuyConfirm()
         {
-            if (AppGame.Instance.StateMachine.CurrentState != GameState.ResolvingSpace) return;
-
-            _isBuyPromptActive = false;
-            if(BuyPanel) BuyPanel.SetActive(false);
             GameEvents.RaiseBuyRequest(_pendingBuyPropertyID);
-            // AddLog($"Player purchasing {_pendingBuyPropertyID}.");
+            BuyPanel.SetActive(false);
         }
 
         private void OnBuyPass()
         {
-            if (AppGame.Instance.StateMachine.CurrentState != GameState.ResolvingSpace) return;
-
-            _isBuyPromptActive = false;
-            if(BuyPanel) BuyPanel.SetActive(false);
-
-            // We need to tell the TurnController to end the turn
-            TurnController tc = FindObjectOfType<TurnController>();
-            if (tc != null)
-                tc.EndTurn();
-            else
-                Debug.LogError("UIManager: Could not find TurnController to end turn on 'Pass'.");
-
-
+            FindObjectOfType<TurnController>().EndTurn();
+            BuyPanel.SetActive(false);
             AddLog("Player passed on purchase.");
         }
 
@@ -220,7 +200,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             if (LogText != null)
             {
                 LogText.text = message + "\n" + LogText.text;
-                if (LogText.text.Length > 1000) // Prune log
+                if (LogText.text.Length > 1000)
                 {
                     LogText.text = LogText.text.Substring(0, 1000);
                 }
@@ -228,4 +208,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         }
     }
 }
-
