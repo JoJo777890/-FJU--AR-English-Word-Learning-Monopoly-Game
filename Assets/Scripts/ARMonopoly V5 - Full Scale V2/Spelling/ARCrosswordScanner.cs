@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Vuforia;
-using TMPro;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Spelling
 {
@@ -20,7 +19,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
             List<TrackedLetter> letters = GetTrackedLetters();
             if (letters.Count == 0)
             {
-                Debug.LogWarning("CrosswordScanner: No letters found.");
+                Debug.LogWarning("CrosswordScanner: No 'SpellingLetter' tags found.");
                 return "";
             }
 
@@ -37,32 +36,33 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
         private List<TrackedLetter> GetTrackedLetters()
         {
             List<TrackedLetter> trackedLetters = new List<TrackedLetter>();
-            
             ObserverBehaviour[] allTargets = FindObjectsOfType<ObserverBehaviour>();
 
             foreach (var tb in allTargets)
             {
-                // --- FIX 1: Correct Vuforia Status Check ---
+                // 1. Only look at tracked objects
                 if (tb.TargetStatus.Status == Status.TRACKED) 
                 {
-                    GameObject obj = tb.gameObject;
-                    string objName = obj.name;
-
-                    if (objName.ToLower().StartsWith("imagetarget"))
+                    // 2. Only look at objects with the "SpellingLetter" tag
+                    if (tb.gameObject.CompareTag("SpellingLetter"))
                     {
-                        char letter = objName[objName.Length - 1];
-                        letter = char.ToUpper(letter);
-
-                        trackedLetters.Add(new TrackedLetter
+                        // 3. Get the letter from the LetterTag component
+                        LetterTag tag = tb.gameObject.GetComponent<LetterTag>();
+                        if (tag != null)
                         {
-                            letter = letter,
-                            position = obj.transform.position
-                        });
+                            trackedLetters.Add(new TrackedLetter
+                            {
+                                letter = char.ToUpper(tag.Letter),
+                                position = tb.gameObject.transform.position
+                            });
+                        }
                     }
                 }
             }
             return trackedLetters;
         }
+
+        // --- No changes below this line ---
 
         private string ScanRows(List<TrackedLetter> letters)
         {
@@ -86,11 +86,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
                 }
             }
 
-            // Here, 'a' and 'b' are List<TrackedLetter>, so a[0] is correct
             rows.Sort((a, b) => b[0].position.y.CompareTo(a[0].position.y));
             foreach (var row in rows)
             {
-                // Here, 'a' and 'b' are TrackedLetter, so a.position is correct
                 row.Sort((a, b) => a.position.x.CompareTo(b.position.x));
             }
 
@@ -126,13 +124,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
                     columns.Add(new List<TrackedLetter> { letter });
                 }
             }
-
-            // Here, 'a' and 'b' are List<TrackedLetter>, so a[0] is correct
+            
             columns.Sort((a, b) => a[0].position.x.CompareTo(b[0].position.x));
             foreach (var col in columns)
             {
-                // --- FIX 2: 'a' is a TrackedLetter, not a list ---
-                // 'a[0]' was a typo.
                 col.Sort((a, b) => b.position.y.CompareTo(a.position.y));
             }
 
