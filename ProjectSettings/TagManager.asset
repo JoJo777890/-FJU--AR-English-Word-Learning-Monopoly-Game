@@ -6,6 +6,7 @@ TagManager:
   tags:
   - FxTemporaire
   - Animals
+  - SpellingLetter
   layers:
   - Default
   - TransparentFX
