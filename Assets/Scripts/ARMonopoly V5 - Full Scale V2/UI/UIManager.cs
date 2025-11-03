@@ -104,7 +104,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                     InvestmentButtons[i].gameObject.SetActive(true);
                     InvestmentButtons[i].onClick.RemoveAllListeners();
                     InvestmentButtons[i].onClick.AddListener(() => {
-                        GameEvents.RaisePlayerInvest(new InvestmentPayload { InvestorID = playerID, TargetPlayerID = tc.CurrentPlayerID });
+                        GameEvents.RaisePlayerInvest(new InvestmentPayload
+                        {
+                            InvestorID = playerID, 
+                            TargetPlayerID = tc.CurrentPlayerID
+                        });
                         InvestmentButtons[playerID - 1].gameObject.SetActive(false); // Disable after investing
                     });
                 }
@@ -137,7 +141,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             }
         }
 
-        private void HandleTurnStarted(int playerID)
+        private void HandleTurnStarted(int playerID) // <-- Add roll dice notification(?)
         {
             TurnText.text = $"Player {playerID}'s Turn";
             DiceRollText.text = "Roll the dice!";

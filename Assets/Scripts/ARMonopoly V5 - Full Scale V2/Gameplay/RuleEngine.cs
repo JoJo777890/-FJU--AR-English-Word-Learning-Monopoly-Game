@@ -119,8 +119,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     // Allow the player to buy
                     GameEvents.RaiseBuyPrompt(new BuyPayload
                     {
-                        PlayerID = currentPlayerID, PropertyID = prop.PropertyID,
-                        PropertyName = prop.DisplayName, Price = prop.Price
+                        PlayerID = currentPlayerID, 
+                        PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, 
+                        Price = prop.Price
                     });
                 }
                 else // Owned property
@@ -148,8 +150,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     _bank.TransferRent(currentPlayerID, ownerID, rentAmount);
                     GameEvents.RaiseRentPaid(new RentPayload
                     {
-                        PayerID = currentPlayerID, OwnerID = ownerID, PropertyID = prop.PropertyID,
-                        PropertyName = prop.DisplayName, Amount = rentAmount
+                        PayerID = currentPlayerID, 
+                        OwnerID = ownerID, 
+                        PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, 
+                        Amount = rentAmount
                     });
                      _turnController.EndTurn();
                 }
@@ -171,8 +176,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             {
                 GameEvents.RaisePropertyBought(new PropertyPayload
                 {
-                    PlayerID = playerID, PropertyID = propToBuy.PropertyID,
-                    PropertyName = propToBuy.DisplayName, Price = propToBuy.Price
+                    PlayerID = playerID, 
+                    PropertyID = propToBuy.PropertyID,
+                    PropertyName = propToBuy.DisplayName, 
+                    Price = propToBuy.Price
                 });
             }
             _turnController.EndTurn();

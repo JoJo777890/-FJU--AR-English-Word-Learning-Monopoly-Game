@@ -69,16 +69,57 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
 
     #region Event Payloads
 
-    public struct ProximityPayload { public int PlayerID; public string PropertyID; }
-    public struct MovePayload { public int PlayerID; public string DestinationName; public string DestinationPropertyID; }
-    public struct BuyPayload { public int PlayerID; public string PropertyID; public string PropertyName; public int Price; }
-    public struct PropertyPayload { public int PlayerID; public string PropertyID; public string PropertyName; public int Price; }
-    public struct RentPayload { public int PayerID; public int OwnerID; public string PropertyID; public string PropertyName; public int Amount; }
+    public struct ProximityPayload 
+    {
+        public int PlayerID; 
+        public string PropertyID;
+    }
+    public struct MovePayload 
+    {
+        public int PlayerID; 
+        public string DestinationName; 
+        public string DestinationPropertyID;
+    }
+    public struct BuyPayload 
+    {
+        public int PlayerID; 
+        public string PropertyID; 
+        public string PropertyName; 
+        public int Price;
+    }
+    public struct PropertyPayload 
+    {
+        public int PlayerID; 
+        public string PropertyID; 
+        public string PropertyName; 
+        public int Price;
+    }
+    public struct RentPayload 
+    {
+        public int PayerID; 
+        public int OwnerID; 
+        public string PropertyID; 
+        public string PropertyName; 
+        public int Amount;
+    }
     
     // --- New Payloads ---
-    public struct SpellingQuestionPayload { public int PlayerID; public Data.SpellingQuestion Question; public string PropertyID; }
-    public struct InvestmentPayload { public int InvestorID; public int TargetPlayerID; public int Amount; }
-    public struct SpellingAnswerPayload { public int PlayerID; public string Answer; }
+    public struct SpellingQuestionPayload 
+    {
+        public int PlayerID; 
+        public Data.SpellingQuestion Question; 
+        public string PropertyID;
+    }
+    public struct InvestmentPayload 
+    {
+        public int InvestorID; 
+        public int TargetPlayerID; 
+        public int Amount;
+    }
+    public struct SpellingAnswerPayload { 
+        public int PlayerID; 
+        public string Answer; 
+    }
 
 
     #endregion
