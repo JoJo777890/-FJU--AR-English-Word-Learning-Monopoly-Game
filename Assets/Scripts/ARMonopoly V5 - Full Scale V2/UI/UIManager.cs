@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Gameplay;
+using ARMonopoly_V5___Full_Scale_V2.Spelling; // <-- Add this namespace
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,7 +14,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         [Header("State Panels")]
         public GameObject BuyPanel;
         public GameObject MoveNotificationPanel;
-        public GameObject SpellingPanel; // New
+        public GameObject SpellingPanel;
 
         [Header("HUD")]
         public Button RollButton;
@@ -29,12 +30,13 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         [Header("Move Panel")]
         public TextMeshProUGUI MoveNotificationText;
         
-        [Header("Spelling Panel")] // New
+        [Header("Spelling Panel")]
         public TextMeshProUGUI SpellingQuestionText;
         public TMP_InputField SpellingAnswerInput;
-        public Button SpellingSubmitButton;
-        public Button[] InvestmentButtons; // Assign buttons for players who can invest
-        
+        public Button SpellingSubmitButton; // This is the "Confirm" button
+        public Button ScanAnswerButton;     // New button to trigger the scan
+        public Button[] InvestmentButtons;
+        public ARCrosswordScanner crosswordScanner; // New: Reference to the scanner
 
         [Header("Log")]
         public TextMeshProUGUI LogText;
@@ -46,6 +48,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             if(BuyButton_Confirm) BuyButton_Confirm.onClick.AddListener(OnBuyConfirm);
             if(BuyButton_Pass) BuyButton_Pass.onClick.AddListener(OnBuyPass);
             if(SpellingSubmitButton) SpellingSubmitButton.onClick.AddListener(OnSpellingSubmit);
+            if(ScanAnswerButton) ScanAnswerButton.onClick.AddListener(OnScanAnswer); // New
 
             BuyPanel.SetActive(false);
             MoveNotificationPanel.SetActive(false);
@@ -93,8 +96,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             SpellingQuestionText.text = payload.Question.QuestionText;
             SpellingAnswerInput.text = "";
 
+            // Show scan button, hide submit button
+            ScanAnswerButton.gameObject.SetActive(true);
+            SpellingSubmitButton.gameObject.SetActive(false);
+            SpellingAnswerInput.gameObject.SetActive(true); // Keep this visible to show the result
+
             // Configure investment buttons
-            // This is a simple example for a 2-player game. You can expand this logic.
             TurnController tc = FindObjectOfType<TurnController>();
             for(int i = 0; i < InvestmentButtons.Length; i++)
             {
@@ -103,13 +110,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                 {
                     InvestmentButtons[i].gameObject.SetActive(true);
                     InvestmentButtons[i].onClick.RemoveAllListeners();
+                    int capturedInvestorID = playerID; // Capture variable for listener
                     InvestmentButtons[i].onClick.AddListener(() => {
-                        GameEvents.RaisePlayerInvest(new InvestmentPayload
-                        {
-                            InvestorID = playerID, 
-                            TargetPlayerID = tc.CurrentPlayerID
-                        });
-                        InvestmentButtons[playerID - 1].gameObject.SetActive(false); // Disable after investing
+                        GameEvents.RaisePlayerInvest(new InvestmentPayload { InvestorID = capturedInvestorID, TargetPlayerID = tc.CurrentPlayerID });
+                        InvestmentButtons[capturedInvestorID - 1].gameObject.SetActive(false);
                     });
                 }
                 else
@@ -118,7 +122,31 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Called when the "Scan Answer" button is clicked.
+        /// </summary>
+        private void OnScanAnswer()
+        {
+            if (crosswordScanner == null)
+            {
+                AddLog("Crossword Scanner not assigned to UIManager!");
+                return;
+            }
+
+            // Run the scan and get the first word
+            string scannedWord = crosswordScanner.GetFirstHorizontalWord();
+            SpellingAnswerInput.text = scannedWord;
+            AddLog($"Scanned word: {scannedWord}");
+
+            // Hide scan button, show submit button
+            ScanAnswerButton.gameObject.SetActive(false);
+            SpellingSubmitButton.gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Called when the "Submit" (confirm) button is clicked.
+        /// </summary>
         private void OnSpellingSubmit()
         {
             TurnController tc = FindObjectOfType<TurnController>();
@@ -141,7 +169,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             }
         }
 
-        private void HandleTurnStarted(int playerID) // <-- Add roll dice notification(?)
+        private void HandleTurnStarted(int playerID)
         {
             TurnText.text = $"Player {playerID}'s Turn";
             DiceRollText.text = "Roll the dice!";
