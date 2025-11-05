@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26b6d2f58df5e03409168b92ed058bbb, type: 3}
   m_Name: SpellingQuestion_2
   m_EditorClassIdentifier: 
-  QuestionText: 2. Spell CM
-  CorrectAnswer: CM
+  QuestionText: 2. Spell MC
+  CorrectAnswer: MC
   FineAmount: 50
