@@ -42,6 +42,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         [Header("Log")]
         public TextMeshProUGUI LogText;
+        
+        [Header("Fading Log")]
+        public GameObject fadingLogPrefab; // The prefab we will create in Step 3
+        public Transform fadingLogContainer; // The parent to hold the fading logs
 
         private string _pendingBuyPropertyID;
 
@@ -101,7 +105,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             SpellingPanel.SetActive(newState == GameState.AwaitingSpellingAnswer);
             
             // We can still have the UI log its own events if we want
-            GameEvents.RaiseLogMessage($"Game state changed to: {newState}");
+            // GameEvents.RaiseLogMessage($"Game state changed to: {newState}");
         }
         
         private void HandleSpellingQuestion(SpellingQuestionPayload payload)
@@ -207,6 +211,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         // --- This is now a private method, just for this class ---
         private void AddLog(string message)
         {
+            // --- 1. Your existing logic to update the persistent log ---
             Debug.Log(message);
             if (LogText != null)
             {
@@ -216,6 +221,14 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                     LogText.text = LogText.text.Substring(0, 1000);
                 }
             }
+
+            // --- 2. NEW logic to spawn the fading message ---
+            if (fadingLogPrefab != null && fadingLogContainer != null)
+            {
+                GameObject logGO = Instantiate(fadingLogPrefab, fadingLogContainer);
+                logGO.GetComponent<FadingLogMessage>().Initialize(message);
+            }
+            // --- END NEW ---
         }
     }
 }

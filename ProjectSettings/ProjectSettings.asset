@@ -13,7 +13,7 @@ PlayerSettings:
   useOnDemandResources: 0
   accelerometerFrequency: 60
   companyName: FJU
-  productName: LEARN-OPOLY__v0_15_Full-Scale__Achieved_Truly_AR_Spelling_Challenge
+  productName: LEARN-OPOLY_v0_15 _ Full-Scale__Achieved_Truly_AR_Spelling_Challenge
   defaultCursor: {fileID: 0}
   cursorHotspot: {x: 0, y: 0}
   m_SplashScreenBackgroundColor: {r: 0.13725491, g: 0.12156863, b: 0.1254902, a: 1}
@@ -164,7 +164,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.4
   androidMinAspectRatio: 1
   applicationIdentifier:
-    Android: com.FJU.LEARNOPOLY__v0_15_FullScale__Achieved_Truly_AR_Spelling_Challenge
+    Android: com.FJU.LEARNOPOLY_v0_15_FullScale__Achieved_Truly_AR_Spelling_Challenge
     Lumin: com.PTCInc.VuforiaEngine
     Standalone: com.PTCInc.VuforiaEngine
     iPhone: com.vuforia.engine.VuforiaEngine
