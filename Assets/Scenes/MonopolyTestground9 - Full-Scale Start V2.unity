@@ -11691,7 +11691,7 @@ MonoBehaviour:
   - {fileID: 1776281536}
   crosswordScanner: {fileID: 331725416}
   LogText: {fileID: 818450875}
-  fadingLogPrefab: {fileID: 7273452720505545268, guid: 5aa69c28060e60a479c50f8c5f5734c5,
+  fadingLogPrefab: {fileID: 7367300450702489440, guid: 5aa69c28060e60a479c50f8c5f5734c5,
     type: 3}
   fadingLogContainer: {fileID: 1911150673}
 --- !u!1 &1268645027
@@ -17247,10 +17247,10 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 0
+    m_Top: 10
     m_Bottom: 0
   m_ChildAlignment: 1
-  m_Spacing: 10
+  m_Spacing: 30
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
