@@ -29,7 +29,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         public int GetPropertyOwner(string propertyID)
         {
             _propertyOwners.TryGetValue(propertyID, out int ownerID);
-            return ownerID != 0 ? ownerID : -1;
+            return ownerID != 0 ? ownerID : -1; // Return -1 for unowned
         }
         
         public bool BuyProperty(int playerID, PropertyDef property)
@@ -37,7 +37,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             if (property == null) return false;
             
             int owner = GetPropertyOwner(property.PropertyID);
-            if (owner != -1) return false;
+            if (owner != -1) return false; // Already owned
 
             Wallet payerWallet = GetWallet(playerID);
             if (payerWallet == null) return false;
@@ -46,11 +46,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             {
                 payerWallet.Remove(property.Price);
                 _propertyOwners[property.PropertyID] = playerID;
-                Debug.Log($"[Bank] Player {playerID} bought {property.PropertyID}");
+                // Log is handled by RuleEngine
                 return true;
             }
             
-            return false;
+            return false; // Not enough money
         }
 
         public bool TransferRent(int payerID, int ownerID, int amount)
@@ -59,9 +59,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             Wallet ownerWallet = GetWallet(ownerID);
 
             if (payerWallet == null || ownerWallet == null) return false;
-
+            
             payerWallet.Remove(amount);
             ownerWallet.Add(amount);
+            
+            GameEvents.RaiseLogMessage($"Rent: ${amount} transferred from P{payerID} to P{ownerID}.");
             return true;
         }
         
@@ -69,6 +71,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         public void TakeInvestment(int investorID, int amount)
         {
             GetWallet(investorID)?.Remove(amount);
+            GameEvents.RaiseLogMessage($"[Bank] P{investorID} invested ${amount}.");
         }
 
         public void RewardInvestment(int investorID, int originalAmount)
@@ -76,7 +79,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             // Return original investment + reward
             int totalReturn = originalAmount + originalAmount; 
             GetWallet(investorID)?.Add(totalReturn);
-            Debug.Log($"[Bank] Rewarded Player {investorID} with ${totalReturn}.");
+            GameEvents.RaiseLogMessage($"[Bank] Rewarded P{investorID} with ${totalReturn}.");
         }
     }
 }

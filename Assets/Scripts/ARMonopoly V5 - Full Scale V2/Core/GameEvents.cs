@@ -1,5 +1,6 @@
 // In folder: ARMonopoly V5 - Full Scale V2/Core/
 using System;
+using ARMonopoly_V5___Full_Scale_V2.Data; // Added for SpellingQuestion payload
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
 {
@@ -9,8 +10,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         PlayerTurn,
         AwaitingPlayerMove,
         ResolvingSpace,
-        AwaitingSpellingAnswer, // New State
-        ResolvingSpelling      // New State
+        AwaitingSpellingAnswer,
+        ResolvingSpelling
     }
 
     public static class GameEvents
@@ -18,6 +19,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         // --- Game State ---
         public static event Action<GameState> OnStateChanged;
         public static void RaiseStateChanged(GameState newState) => OnStateChanged?.Invoke(newState);
+
+        // --- NEW: Log Event ---
+        public static event Action<string> OnLogMessage;
+        public static void RaiseLogMessage(string message) => OnLogMessage?.Invoke(message);
 
         // --- Turn Flow ---
         public static event Action<int> OnTurnStarted;
@@ -68,7 +73,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
     }
 
     #region Event Payloads
-
+    
     public struct ProximityPayload 
     {
         public int PlayerID; 
@@ -102,8 +107,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public string PropertyName; 
         public int Amount;
     }
-    
-    // --- New Payloads ---
     public struct SpellingQuestionPayload 
     {
         public int PlayerID; 
@@ -118,9 +121,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
     }
     public struct SpellingAnswerPayload { 
         public int PlayerID; 
-        public string Answer; 
-    }
-
-
+        public string Answer; }
+    
     #endregion
 }

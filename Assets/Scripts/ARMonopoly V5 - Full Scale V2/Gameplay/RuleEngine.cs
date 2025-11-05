@@ -22,7 +22,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private string _propertyInQuestionID;
         private List<int> _investors = new List<int>();
 
-
         private void Awake()
         {
             _bank = AppGame.Instance.Bank;
@@ -31,6 +30,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             _stateMachine = AppGame.Instance.StateMachine;
             _turnController = GetComponent<TurnController>();
             _spellingDB = AppGame.Instance.SpellingDB;
+
+            if (_bank == null || _board == null || _rentCalculator == null || _stateMachine == null || _turnController == null || _spellingDB == null)
+            {
+                Debug.LogError("RuleEngine: Missing one or more critical references!");
+            }
         }
 
         private void OnEnable()
@@ -57,7 +61,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             if (payload.PlayerID != _turnController.CurrentPlayerID) return;
             if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID) return;
 
-            Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}. Starting Spelling Round.");
+            Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}.");
             _stateMachine.SetState(GameState.AwaitingSpellingAnswer);
 
             _propertyInQuestionID = payload.PropertyID;
@@ -66,6 +70,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
             if (_currentQuestion != null)
             {
+                GameEvents.RaiseLogMessage($"Spelling challenge for P{payload.PlayerID} on {_propertyInQuestionID}!");
                 GameEvents.RaiseSpellingQuestion(new SpellingQuestionPayload
                 {
                     PlayerID = payload.PlayerID,
@@ -75,7 +80,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
             else
             {
-                Debug.LogError("No spelling questions found in the database! Ending turn.");
+                GameEvents.RaiseLogMessage("Error: No spelling questions found in DB!");
                 _turnController.EndTurn();
             }
         }
@@ -91,7 +96,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             {
                 _bank.TakeInvestment(payload.InvestorID, investmentAmount);
                 _investors.Add(payload.InvestorID);
-                Debug.Log($"Player {payload.InvestorID} invested in Player {payload.TargetPlayerID}.");
+                GameEvents.RaiseLogMessage($"Player {payload.InvestorID} invested in Player {payload.TargetPlayerID}.");
+            }
+            else
+            {
+                GameEvents.RaiseLogMessage($"Player {payload.InvestorID} cannot afford to invest.");
             }
         }
         
@@ -106,59 +115,56 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
             if (isCorrect)
             {
-                Debug.Log($"Player {currentPlayerID} answered correctly!");
-                // Handle rewards for investors
+                GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered CORRECTLY! ({payload.Answer.ToUpper()})");
+                
                 foreach (var investorID in _investors)
                 {
                     _bank.RewardInvestment(investorID, prop.Price / 2);
                 }
 
                 int ownerID = _bank.GetPropertyOwner(prop.PropertyID);
-                if (ownerID == -1) // Unowned property
+                if (ownerID == -1) 
                 {
-                    // Allow the player to buy
+                    GameEvents.RaiseLogMessage("Player can now buy the property.");
                     GameEvents.RaiseBuyPrompt(new BuyPayload
                     {
-                        PlayerID = currentPlayerID, 
-                        PropertyID = prop.PropertyID,
-                        PropertyName = prop.DisplayName, 
-                        Price = prop.Price
+                        PlayerID = currentPlayerID, PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, Price = prop.Price
                     });
                 }
-                else // Owned property
+                else 
                 {
-                    Debug.Log($"Player {currentPlayerID} answered correctly and waives rent.");
+                    GameEvents.RaiseLogMessage($"Player {currentPlayerID} waives rent.");
                     _turnController.EndTurn();
                 }
             }
             else
             {
-                Debug.Log($"Player {currentPlayerID} answered incorrectly.");
-                // Investors lose their money (Bank already has it)
-                Debug.Log($"Investors lost their investment.");
+                GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered INCORRECTLY. (Was: {payload.Answer.ToUpper()}, Ans: {_currentQuestion.CorrectAnswer.ToUpper()})");
+                
+                if(_investors.Count > 0)
+                    GameEvents.RaiseLogMessage("Investors have lost their investment.");
 
                 int ownerID = _bank.GetPropertyOwner(prop.PropertyID);
                  if (ownerID == -1) // Unowned
                 {
                     _bank.GetWallet(currentPlayerID).Remove(_currentQuestion.FineAmount);
-                    Debug.Log($"Player {currentPlayerID} was fined ${_currentQuestion.FineAmount}");
+                    GameEvents.RaiseLogMessage($"Player {currentPlayerID} is fined ${_currentQuestion.FineAmount}.");
                     _turnController.EndTurn();
                 }
                 else if(ownerID != currentPlayerID) // Owned by someone else
                 {
+                    GameEvents.RaiseLogMessage($"Player {currentPlayerID} must pay rent.");
                     int rentAmount = _rentCalculator.CalculateRent(prop);
                     _bank.TransferRent(currentPlayerID, ownerID, rentAmount);
                     GameEvents.RaiseRentPaid(new RentPayload
                     {
-                        PayerID = currentPlayerID, 
-                        OwnerID = ownerID, 
-                        PropertyID = prop.PropertyID,
-                        PropertyName = prop.DisplayName, 
-                        Amount = rentAmount
+                        PayerID = currentPlayerID, OwnerID = ownerID, PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, Amount = rentAmount
                     });
                      _turnController.EndTurn();
                 }
-                else // Landed on their own property
+                else 
                 {
                     _turnController.EndTurn();
                 }
@@ -174,6 +180,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
             if (_bank.BuyProperty(playerID, propToBuy))
             {
+                GameEvents.RaiseLogMessage($"Player {playerID} bought {propToBuy.DisplayName} for ${propToBuy.Price}.");
                 GameEvents.RaisePropertyBought(new PropertyPayload
                 {
                     PlayerID = playerID, 
@@ -181,6 +188,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     PropertyName = propToBuy.DisplayName, 
                     Price = propToBuy.Price
                 });
+            }
+            else
+            {
+                GameEvents.RaiseLogMessage($"Player {playerID} failed to buy {propToBuy.DisplayName}.");
             }
             _turnController.EndTurn();
         }
@@ -192,7 +203,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             if (wallet != null)
             {
                 wallet.Add(passGoMoney);
-                Debug.Log($"Player {playerID} passed Go, credited ${passGoMoney}");
+                GameEvents.RaiseLogMessage($"Player {playerID} passed Go, credited ${passGoMoney}.");
             }
         }
     }

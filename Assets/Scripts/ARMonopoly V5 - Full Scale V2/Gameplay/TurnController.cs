@@ -1,3 +1,4 @@
+// In folder: ARMonopoly V5 - Full Scale V2/Gameplay/
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
@@ -54,7 +55,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             // 1. Roll Dice
             int roll = Random.Range(1, 7) + Random.Range(1, 7);
             GameEvents.RaiseDiceRolled(CurrentPlayerID, roll);
-            Debug.Log($"Player {CurrentPlayerID} rolled a {roll}");
+            GameEvents.RaiseLogMessage($"Player {CurrentPlayerID} rolled a {roll}.");
 
             // 2. Get Player's current position
             if (!_playerTags.ContainsKey(CurrentPlayerID))
@@ -98,19 +99,15 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 DestinationName = destination.DisplayName,
                 DestinationPropertyID = destination.PropertyID
             });
+            
+            GameEvents.RaiseLogMessage($"Player {CurrentPlayerID} must move to {destination.DisplayName}.");
 
             // 7. Change state to wait for the physical move
             _stateMachine.SetState(GameState.AwaitingPlayerMove);
-            
-            // // 4. Check for "Pass Go"    <----- I tried to move Step 4 here, but "Pass Go" message still appeared before player arrives at its destination.
-            // if (newIndex < oldIndex) // They wrapped around
-            // {
-            //     GameEvents.RaisePlayerPassedGo(CurrentPlayerID);
-            // }
         }
 
         /// <summary>
-        /// This is now called by RuleEngine AFTER a landing is resolved or passed.
+        // This is called by RuleEngine AFTER a landing is resolved or passed.
         /// </summary>
         public void EndTurn()
         {
@@ -124,8 +121,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             CurrentPlayerID = PlayerOrder[_turnIndex];
 
             _stateMachine.SetState(GameState.PlayerTurn);
+            GameEvents.RaiseLogMessage($"--- Player {CurrentPlayerID}'s Turn Begins ---");
             GameEvents.RaiseTurnStarted(CurrentPlayerID);
         }
     }
 }
-

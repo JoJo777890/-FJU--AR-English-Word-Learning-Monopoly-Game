@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Gameplay;
-using ARMonopoly_V5___Full_Scale_V2.Spelling; // <-- Add this namespace
+using ARMonopoly_V5___Full_Scale_V2.Spelling;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,10 +11,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 {
     public class UIManager : MonoBehaviour
     {
+        // --- Static Instance and Log method are REMOVED ---
+        
         [Header("State Panels")]
         public GameObject BuyPanel;
         public GameObject MoveNotificationPanel;
-        public GameObject SpellingPanel;
+        public GameObject SpellingPanel; 
 
         [Header("HUD")]
         public Button RollButton;
@@ -30,13 +32,13 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         [Header("Move Panel")]
         public TextMeshProUGUI MoveNotificationText;
         
-        [Header("Spelling Panel")]
+        [Header("Spelling Panel")] 
         public TextMeshProUGUI SpellingQuestionText;
         public TMP_InputField SpellingAnswerInput;
-        public Button SpellingSubmitButton; // This is the "Confirm" button
-        public Button ScanAnswerButton;     // New button to trigger the scan
-        public Button[] InvestmentButtons;
-        public ARCrosswordScanner crosswordScanner; // New: Reference to the scanner
+        public Button SpellingSubmitButton;
+        public Button ScanAnswerButton;
+        public Button[] InvestmentButtons; 
+        public ARCrosswordScanner crosswordScanner;
 
         [Header("Log")]
         public TextMeshProUGUI LogText;
@@ -45,10 +47,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void Awake()
         {
+            // --- Singleton logic is REMOVED ---
+            
             if(BuyButton_Confirm) BuyButton_Confirm.onClick.AddListener(OnBuyConfirm);
             if(BuyButton_Pass) BuyButton_Pass.onClick.AddListener(OnBuyPass);
             if(SpellingSubmitButton) SpellingSubmitButton.onClick.AddListener(OnSpellingSubmit);
-            if(ScanAnswerButton) ScanAnswerButton.onClick.AddListener(OnScanAnswer); // New
+            if(ScanAnswerButton) ScanAnswerButton.onClick.AddListener(OnScanAnswer);
 
             BuyPanel.SetActive(false);
             MoveNotificationPanel.SetActive(false);
@@ -57,6 +61,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void OnEnable()
         {
+            // --- ADDED: Subscription to the new log event ---
+            GameEvents.OnLogMessage += AddLog;
+            
             GameEvents.OnStateChanged += HandleStateChanged;
             GameEvents.OnTurnStarted += HandleTurnStarted;
             GameEvents.OnDiceRolled += HandleDiceRolled;
@@ -71,6 +78,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
         private void OnDisable()
         {
+            // --- ADDED: Unsubscription from the new log event ---
+            GameEvents.OnLogMessage -= AddLog;
+            
             GameEvents.OnStateChanged -= HandleStateChanged;
             GameEvents.OnTurnStarted -= HandleTurnStarted;
             GameEvents.OnDiceRolled -= HandleDiceRolled;
@@ -89,28 +99,28 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);
             BuyPanel.SetActive(newState == GameState.ResolvingSpace || newState == GameState.ResolvingSpelling);
             SpellingPanel.SetActive(newState == GameState.AwaitingSpellingAnswer);
+            
+            // We can still have the UI log its own events if we want
+            GameEvents.RaiseLogMessage($"Game state changed to: {newState}");
         }
         
         private void HandleSpellingQuestion(SpellingQuestionPayload payload)
         {
             SpellingQuestionText.text = payload.Question.QuestionText;
             SpellingAnswerInput.text = "";
-
-            // Show scan button, hide submit button
             ScanAnswerButton.gameObject.SetActive(true);
-            SpellingSubmitButton.gameObject.SetActive(true);
-            SpellingAnswerInput.gameObject.SetActive(true); // Keep this visible to show the result
+            SpellingSubmitButton.gameObject.SetActive(true); 
+            SpellingAnswerInput.gameObject.SetActive(true); 
 
-            // Configure investment buttons
             TurnController tc = FindObjectOfType<TurnController>();
             for(int i = 0; i < InvestmentButtons.Length; i++)
             {
-                int playerID = i + 1; // Assuming player IDs are 1-based
+                int playerID = i + 1;
                 if (playerID != tc.CurrentPlayerID)
                 {
                     InvestmentButtons[i].gameObject.SetActive(true);
                     InvestmentButtons[i].onClick.RemoveAllListeners();
-                    int capturedInvestorID = playerID; // Capture variable for listener
+                    int capturedInvestorID = playerID;
                     InvestmentButtons[i].onClick.AddListener(() => {
                         GameEvents.RaisePlayerInvest(new InvestmentPayload { InvestorID = capturedInvestorID, TargetPlayerID = tc.CurrentPlayerID });
                         InvestmentButtons[capturedInvestorID - 1].gameObject.SetActive(false);
@@ -122,31 +132,19 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                 }
             }
         }
-
-        /// <summary>
-        /// Called when the "Scan Answer" button is clicked.
-        /// </summary>
+        
         private void OnScanAnswer()
         {
             if (crosswordScanner == null)
             {
-                AddLog("Crossword Scanner not assigned to UIManager!");
+                GameEvents.RaiseLogMessage("Crossword Scanner not assigned to UIManager!");
                 return;
             }
-
-            // Run the scan and get the first word
             string scannedWord = crosswordScanner.GetFirstHorizontalWord();
             SpellingAnswerInput.text = scannedWord;
-            AddLog($"Scanned word: {scannedWord}");
-
-            // Hide scan button, show submit button
-            // ScanAnswerButton.gameObject.SetActive(false);
-            // SpellingSubmitButton.gameObject.SetActive(true);
+            GameEvents.RaiseLogMessage($"Scanned word: {scannedWord}");
         }
-
-        /// <summary>
-        /// Called when the "Submit" (confirm) button is clicked.
-        /// </summary>
+        
         private void OnSpellingSubmit()
         {
             TurnController tc = FindObjectOfType<TurnController>();
@@ -156,37 +154,27 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                 Answer = SpellingAnswerInput.text
             });
             SpellingPanel.SetActive(false);
+            GameEvents.RaiseLogMessage("Spelling answer submitted.");
         }
-
-
-        // ... (rest of the UIManager code is the same)
-
-        private void OnPlayerPassedGo(int pid)
-        {
-            if (AppGame.Instance.Config != null)
-            {
-                AddLog($"Player {pid} passed GO! Received ${AppGame.Instance.Config.PassGoMoney}");
-            }
-        }
-
-        private void HandleTurnStarted(int playerID)
+        
+        // --- These event handlers are now just for UI updates ---
+        private void OnPlayerPassedGo(int pid) { } // Log is handled by RuleEngine
+        private void HandleTurnStarted(int playerID) 
         {
             TurnText.text = $"Player {playerID}'s Turn";
             DiceRollText.text = "Roll the dice!";
-            AddLog($"Player {playerID}'s turn has started.");
         }
-
-        private void HandleDiceRolled(int playerID, int totalRoll)
+        private void HandleDiceRolled(int playerID, int totalRoll) 
         {
             DiceRollText.text = $"Player {playerID} rolled a {totalRoll}!";
         }
-
-        private void HandleMoveRequired(MovePayload payload)
+        private void HandleMoveRequired(MovePayload payload) 
         {
             MoveNotificationText.text = $"Player {payload.PlayerID}, please move to:\n{payload.DestinationName}";
-            AddLog($"Waiting for Player {payload.PlayerID} to move to {payload.DestinationName}.");
         }
-
+        private void HandlePropertyBought(PropertyPayload payload) { } // Log is handled by RuleEngine
+        private void HandleRentPaid(RentPayload payload) { } // Log is handled by Bank
+        
         private void HandleMoneyChanged(int playerID, int newBalance)
         {
             int moneyIndex = playerID - 1;
@@ -213,19 +201,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         {
             FindObjectOfType<TurnController>().EndTurn();
             BuyPanel.SetActive(false);
-            AddLog("Player passed on purchase.");
+            GameEvents.RaiseLogMessage("Player passed on purchase.");
         }
 
-        private void HandlePropertyBought(PropertyPayload payload)
-        {
-            AddLog($"Player {payload.PlayerID} bought {payload.PropertyName} for ${payload.Price}!");
-        }
-
-        private void HandleRentPaid(RentPayload payload)
-        {
-            AddLog($"Player {payload.PayerID} paid ${payload.Amount} rent to Player {payload.OwnerID} for {payload.PropertyName}.");
-        }
-
+        // --- This is now a private method, just for this class ---
         private void AddLog(string message)
         {
             Debug.Log(message);
