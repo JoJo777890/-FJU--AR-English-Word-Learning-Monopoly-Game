@@ -59,7 +59,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             if(ScanAnswerButton) ScanAnswerButton.onClick.AddListener(OnScanAnswer);
 
             BuyPanel.SetActive(false);
-            MoveNotificationPanel.SetActive(false);
+            // MoveNotificationPanel.SetActive(false);
             SpellingPanel.SetActive(false);
         }
 
@@ -100,7 +100,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         private void HandleStateChanged(GameState newState)
         {
             RollButton.interactable = (newState == GameState.PlayerTurn);
-            MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);
+            // MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);
             BuyPanel.SetActive(newState == GameState.ResolvingSpace || newState == GameState.ResolvingSpelling);
             SpellingPanel.SetActive(newState == GameState.AwaitingSpellingAnswer);
             
@@ -165,6 +165,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         private void OnPlayerPassedGo(int pid) { } // Log is handled by RuleEngine
         private void HandleTurnStarted(int playerID) 
         {
+            MoveNotificationText.text = $"Player {playerID}, please roll the dice!";
             TurnText.text = $"Player {playerID}'s Turn";
             DiceRollText.text = "Roll the dice!";
         }
