@@ -98,7 +98,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
             // Show scan button, hide submit button
             ScanAnswerButton.gameObject.SetActive(true);
-            SpellingSubmitButton.gameObject.SetActive(false);
+            SpellingSubmitButton.gameObject.SetActive(true);
             SpellingAnswerInput.gameObject.SetActive(true); // Keep this visible to show the result
 
             // Configure investment buttons
@@ -140,8 +140,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             AddLog($"Scanned word: {scannedWord}");
 
             // Hide scan button, show submit button
-            ScanAnswerButton.gameObject.SetActive(false);
-            SpellingSubmitButton.gameObject.SetActive(true);
+            // ScanAnswerButton.gameObject.SetActive(false);
+            // SpellingSubmitButton.gameObject.SetActive(true);
         }
 
         /// <summary>
