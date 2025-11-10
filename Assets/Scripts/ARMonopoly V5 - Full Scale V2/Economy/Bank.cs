@@ -6,8 +6,8 @@ using UnityEngine;
 namespace ARMonopoly_V5___Full_Scale_V2.Economy
 {
     /// <summary>
-    /// A service class (not a MonoBehaviour) that manages all money and property ownership.
-    /// Instantiated and held by AppGame.
+    /// Manages all player wallets and property ownership.
+    /// Acts as the central ledger for all financial transactions.
     /// </summary>
     public class Bank
     {
@@ -18,7 +18,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         private Dictionary<string, int> _propertyOwners = new Dictionary<string, int>();
 
         /// <summary>
-        /// Creates a new Wallet for a player and registers them with the bank.
+        /// Registers a new player, creating their wallet with starting money.
+        /// Fires OnMoneyChanged to update UI.
         /// </summary>
         public void RegisterPlayer(int playerID, int startingMoney)
         {
@@ -49,9 +50,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         }
         
         /// <summary>
-        /// Attempts to process a property purchase for a player.
+        /// Attempts to purchase an unowned property for a player.
         /// </summary>
-        /// <returns>True if successful, false otherwise.</returns>
+        /// <returns>True if the purchase was successful, false otherwise.</returns>
         public bool BuyProperty(int playerID, PropertyDef property)
         {
             if (property == null) return false;
@@ -74,7 +75,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         }
 
         /// <summary>
-        /// Transfers rent from one player's wallet to another.
+        /// Transfers a specified rent amount between two players.
         /// </summary>
         /// <returns>True if successful.</returns>
         public bool TransferRent(int payerID, int ownerID, int amount)
@@ -93,8 +94,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             return true;
         }
         
+        // --- Investment Logic ---
+        
         /// <summary>
-        /// Takes the investment amount from the investor's wallet (held by Bank).
+        /// Takes an investment from a player during a spelling challenge.
         /// </summary>
         public void TakeInvestment(int investorID, int amount)
         {
@@ -103,7 +106,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
         }
 
         /// <summary>
-        /// Rewards an investor by returning their original stake plus a bonus.
+        ///         /// Rewards an investor with their original investment plus a reward.
         /// </summary>
         public void RewardInvestment(int investorID, int originalAmount)
         {
