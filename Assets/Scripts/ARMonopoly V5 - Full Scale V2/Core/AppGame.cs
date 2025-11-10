@@ -1,4 +1,3 @@
-// In folder: ARMonopoly V5 - Full Scale V2/Core/
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
@@ -6,27 +5,43 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
 {
+    /// <summary>
+    /// Central singleton (Monobehaviour) that holds references to core systems
+    /// and ScriptableObject data assets. Attached to the [GameSystems] GameObject.
+    /// </summary>
     [DefaultExecutionOrder(-100)]
     public class AppGame : MonoBehaviour
     {
+        /// <summary>
+        /// Static singleton instance for easy global access.
+        /// </summary>
         public static AppGame Instance { get; private set; }
 
         [Header("Data Assets")]
+        [Tooltip("Global game settings (starting money, etc.)")]
         public GameConfig Config;
+        [Tooltip("Database of all PropertyDef assets for easy lookup.")]
         public PropertyDatabase PropertyDB;
+        [Tooltip("ScriptableObject defining the board's logical layout and order.")]
         public BoardDefinition Board;
+        [Tooltip("ScriptableObject holding the rent calculation logic.")]
         public RentCalculator RentCalculator;
-        public SpellingQuestionDatabase SpellingDB; // New
+        [Tooltip("Database of all SpellingQuestion assets.")]
+        public SpellingQuestionDatabase SpellingDB;
 
         [Header("Core Systems")]
+        /// <summary>Service for managing all player wallets and property ownership.</summary>
         public Bank Bank { get; private set; }
+        /// <summary>Service for managing the global GameState.</summary>
         public GameStateMachine StateMachine { get; private set; }
 
         [Header("Runtime State")]
+        [Tooltip("The destination property ID the current player is expected to move to.")]
         public string ExpectedDestinationPropertyID;
 
         void Awake()
         {
+            // Enforce singleton pattern
             if (Instance != null && Instance != this)
             {
                 Destroy(gameObject);
@@ -34,8 +49,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
             }
             Instance = this;
 
+            // Initialize core non-MonoBehaviour systems
             Bank = new Bank();
             StateMachine = new GameStateMachine();
+            
+            // Note: PlayerTag.cs instances will register themselves with the Bank
+            // during their own Start() phase to ensure AppGame is ready.
             
             if (Config == null) Debug.LogError("AppGame: GameConfig is not assigned!");
             if (SpellingDB == null) Debug.LogError("AppGame: SpellingDB is not assigned!");

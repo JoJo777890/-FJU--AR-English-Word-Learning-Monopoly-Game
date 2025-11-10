@@ -5,8 +5,8 @@ using UnityEngine;
 namespace ARMonopoly_V5___Full_Scale_V2.Player
 {
     /// <summary>
-    /// Attached to the Player's Image Target.
-    /// Identifies the player and holds their logical board position.
+    /// Identifies a player token in the scene (attached to the Player's Image Target)
+    /// and holds their logical board position.
     /// </summary>
     public class PlayerTag : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         public PropertyDef StartingProperty;
 
         [Header("Runtime")]
-        [Tooltip("The player's current logical index on the board.")]
+        [Tooltip("The player's current logical index on the board (0 = Go).")]
         public int CurrentBoardIndex = 0;
 
         private void Start()
@@ -29,10 +29,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
                 return;
             }
             
-            // --- 1. REGISTER WITH BANK ---
-            // This is the logic we moved from AppGame.cs.
-            // This will also trigger the GameEvents.OnMoneyChanged,
-            // which the UIManager will hear.
+            // 1. Register this player with the Bank
+            // This also triggers the initial OnMoneyChanged event for the UI.
             if (AppGame.Instance.Bank != null)
             {
                 AppGame.Instance.Bank.RegisterPlayer(PlayerID, AppGame.Instance.Config.StartingMoney);
@@ -43,10 +41,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
                 Debug.LogError($"PlayerTag {PlayerID}: Could not find Bank to register with!", this);
             }
             
-            // --- 2. SET STARTING POSITION ---
+            // 2. Set the logical starting position on the board
             if (StartingProperty != null)
             {
-                // Try to find the starting index from the BoardDefinition
                 int startIndex = AppGame.Instance.Board.GetIndexFromID(StartingProperty.PropertyID);
                 if (startIndex != -1)
                 {

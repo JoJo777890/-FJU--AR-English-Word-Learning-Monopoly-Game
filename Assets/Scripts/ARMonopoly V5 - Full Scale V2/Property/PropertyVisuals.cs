@@ -7,21 +7,26 @@ using Vuforia;
 namespace ARMonopoly_V5___Full_Scale_V2.Property
 {
     /// <summary>
+    /// Handles the visual state (scaling) of a property based on player proximity.
+    /// Also maintains the static list of all currently tracked properties.
     /// Attached to the Property's Image Target.
-    /// Manages its own scale based on proximity events.
-    /// Also reports when it is being tracked.
     /// </summary>
     [RequireComponent(typeof(PropertyTag), typeof(ObserverBehaviour))]
     public class PropertyVisuals : MonoBehaviour
     {
-        // A static list of all properties currently being tracked by Vuforia
+        /// <summary>
+        /// Static list of all *currently tracked* properties. 
+        /// PlayerTokenTrigger uses this for efficient proximity checks.
+        /// </summary>
         public static HashSet<PropertyTag> AllTrackedProperties = new HashSet<PropertyTag>();
 
         private PropertyTag _propertyTag;
         private ObserverBehaviour _propertyObserver;
         private GameConfig _config;
-        private Transform _contentChild;
+        private Transform _contentChild; // The 3D model/plane to scale
         private Vector3 _baseScale;
+        
+        // Tracks which players are currently near *this* property
         private HashSet<int> _playersInProximity = new HashSet<int>();
 
         void Awake()
@@ -55,8 +60,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
 
         private void OnEnable()
         {
+            // Listen for proximity events to update scale
             GameEvents.OnProximityEnter += HandleProximityEnter;
             GameEvents.OnProximityExit += HandleProximityExit;
+            // Listen for Vuforia status to update the static list
             _propertyObserver.OnTargetStatusChanged += HandleTargetStatusChanged;
         }
 
@@ -71,6 +78,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
                 AllTrackedProperties.Remove(_propertyTag);
         }
 
+        /// <summary>
+        /// Updates the static list of all tracked properties.
+        /// </summary>
         private void HandleTargetStatusChanged(ObserverBehaviour ob, TargetStatus status)
         {
             bool isTracked = status.Status == Status.TRACKED || status.Status == Status.EXTENDED_TRACKED;
@@ -85,6 +95,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
             }
         }
 
+        /// <summary>
+        /// A player has entered this property's proximity.
+        /// </summary>
         private void HandleProximityEnter(ProximityPayload payload)
         {
             // Is this event about *this* property?
@@ -95,6 +108,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
             }
         }
 
+        /// <summary>
+        /// A player has exited this property's proximity.
+        /// </summary>
         private void HandleProximityExit(ProximityPayload payload)
         {
             // Is this event about *this* property?
@@ -105,6 +121,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
             }
         }
 
+        /// <summary>
+        /// Updates the scale of the content child based on player proximity.
+        /// </summary>
         private void UpdateScale()
         {
             if (_contentChild == null) return;
@@ -121,4 +140,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
         }
     }
 }
-

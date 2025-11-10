@@ -1,4 +1,3 @@
-// In folder: ARMonopoly V5 - Full Scale V2/Gameplay/
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
@@ -8,8 +7,13 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 {
+    /// <summary>
+    /// Main game logic service. Listens for events (like landing) and applies game rules.
+    /// Attached to the [GameSystems] GameObject.
+    /// </summary>
     public class RuleEngine : MonoBehaviour
     {
+        // Core system references
         private Bank _bank;
         private BoardDefinition _board;
         private RentCalculator _rentCalculator;
@@ -22,13 +26,16 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private string _propertyInQuestionID;
         private List<int> _investors = new List<int>();
 
+        /// <summary>
+        /// Caches all required system references from AppGame.
+        /// </summary>
         private void Awake()
         {
             _bank = AppGame.Instance.Bank;
             _board = AppGame.Instance.Board;
             _rentCalculator = AppGame.Instance.RentCalculator;
             _stateMachine = AppGame.Instance.StateMachine;
-            _turnController = GetComponent<TurnController>();
+            _turnController = GetComponent<TurnController>(); // Assumes TurnController is on the same GameObject
             _spellingDB = AppGame.Instance.SpellingDB;
 
             if (_bank == null || _board == null || _rentCalculator == null || _stateMachine == null || _turnController == null || _spellingDB == null)
@@ -37,6 +44,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
         }
 
+        /// <summary>
+        /// Subscribes to all relevant game events.
+        /// </summary>
         private void OnEnable()
         {
             GameEvents.OnProximityEnter += HandleProximityEnter;
@@ -46,6 +56,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             GameEvents.OnSpellingAnswer += HandleSpellingAnswer;
         }
 
+        /// <summary>
+        /// Unsubscribes from all events to prevent memory leaks.
+        /// </summary>
         private void OnDisable()
         {
             GameEvents.OnProximityEnter -= HandleProximityEnter;
@@ -55,15 +68,30 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             GameEvents.OnSpellingAnswer -= HandleSpellingAnswer;
         }
 
+        /// <summary>
+        /// Handles the OnProximityEnter event. This is the "verification" step.
+        /// It checks if the player landed on the *correct* property.
+        /// </summary>
         private void HandleProximityEnter(ProximityPayload payload)
         {
+            // 1. Is the game waiting for this move?
             if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
-            if (payload.PlayerID != _turnController.CurrentPlayerID) return;
-            if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID) return;
 
+            // 2. Is it the correct player?
+            if (payload.PlayerID != _turnController.CurrentPlayerID) return;
+
+            // 3. Is it the correct destination?
+            if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID)
+            {
+                // Player landed on the wrong property, keep waiting.
+                return;
+            }
+
+            // --- Proximity Verified ---
             Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}.");
             _stateMachine.SetState(GameState.AwaitingSpellingAnswer);
 
+            // --- Start Spelling Challenge ---
             _propertyInQuestionID = payload.PropertyID;
             _currentQuestion = _spellingDB.GetRandomQuestion();
             _investors.Clear();
@@ -80,11 +108,14 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
             else
             {
-                GameEvents.RaiseLogMessage("Error: No spelling questions found in DB!");
+                GameEvents.RaiseLogMessage("Error: No spelling questions found in DB! Skipping turn.");
                 _turnController.EndTurn();
             }
         }
         
+        /// <summary>
+        /// Handles the OnPlayerInvest event, triggered by the UI.
+        /// </summary>
         private void HandleInvestment(InvestmentPayload payload)
         {
             if (_stateMachine.CurrentState != GameState.AwaitingSpellingAnswer) return;
@@ -104,6 +135,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
         }
         
+        /// <summary>
+        /// Handles the OnSpellingAnswer event, resolves the challenge, and applies rules.
+        /// </summary>
         private void HandleSpellingAnswer(SpellingAnswerPayload payload)
         {
             if (_stateMachine.CurrentState != GameState.AwaitingSpellingAnswer) return;
@@ -117,28 +151,31 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             {
                 GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered CORRECTLY! ({payload.Answer.ToUpper()})");
                 
+                // Reward all investors
                 foreach (var investorID in _investors)
                 {
                     _bank.RewardInvestment(investorID, prop.Price / 2);
                 }
 
                 int ownerID = _bank.GetPropertyOwner(prop.PropertyID);
-                if (ownerID == -1) 
+                if (ownerID == -1) // Unowned
                 {
+                    // Player answered correctly, now show the buy prompt
                     GameEvents.RaiseLogMessage("Player can now buy the property.");
                     GameEvents.RaiseBuyPrompt(new BuyPayload
                     {
                         PlayerID = currentPlayerID, PropertyID = prop.PropertyID,
                         PropertyName = prop.DisplayName, Price = prop.Price
                     });
+                    // Turn ends when player Buys or Passes via HandleBuyRequest or UIManager.OnBuyPass
                 }
-                else 
+                else // Owned (by self or other)
                 {
                     GameEvents.RaiseLogMessage($"Player {currentPlayerID} waives rent.");
                     _turnController.EndTurn();
                 }
             }
-            else
+            else // Answer was incorrect
             {
                 GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered INCORRECTLY. (Was: {payload.Answer.ToUpper()}, Ans: {_currentQuestion.CorrectAnswer.ToUpper()})");
                 
@@ -157,6 +194,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     GameEvents.RaiseLogMessage($"Player {currentPlayerID} must pay rent.");
                     int rentAmount = _rentCalculator.CalculateRent(prop);
                     _bank.TransferRent(currentPlayerID, ownerID, rentAmount);
+                    // Bank's TransferRent method raises its own log message
                     GameEvents.RaiseRentPaid(new RentPayload
                     {
                         PayerID = currentPlayerID, OwnerID = ownerID, PropertyID = prop.PropertyID,
@@ -164,15 +202,20 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     });
                      _turnController.EndTurn();
                 }
-                else 
+                else // Landed on their own property
                 {
                     _turnController.EndTurn();
                 }
             }
         }
         
+        /// <summary>
+        /// Handles the OnBuyRequest event, triggered by the UI.
+        /// </summary>
         private void HandleBuyRequest(string propertyID)
         {
+            // A buy request can come after a spelling challenge (ResolvingSpelling)
+            // or if we modify the rules for a direct buy (ResolvingSpace)
             if (_stateMachine.CurrentState != GameState.ResolvingSpelling && _stateMachine.CurrentState != GameState.ResolvingSpace) return;
             
             int playerID = _turnController.CurrentPlayerID;
@@ -191,11 +234,16 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
             else
             {
-                GameEvents.RaiseLogMessage($"Player {playerID} failed to buy {propToBuy.DisplayName}.");
+                GameEvents.RaiseLogMessage($"Player {playerID} failed to buy {propToBuy.DisplayName}. (Not enough money or already owned)");
             }
+
+            // Whether buy succeeded or failed, the action is resolved. End the turn.
             _turnController.EndTurn();
         }
 
+        /// <summary>
+        /// Handles the OnPlayerPassedGo event.
+        /// </summary>
         private void HandlePassedGo(int playerID)
         {
             int passGoMoney = AppGame.Instance.Config.PassGoMoney;

@@ -1,10 +1,12 @@
-// In folder: ARMonopoly V5 - Full Scale V2/UI/
 using UnityEngine;
 using TMPro;
 using System.Collections;
 
 namespace ARMonopoly_V5___Full_Scale_V2.UI
 {
+    /// <summary>
+    /// Controls the behavior of a single fading log message prefab.
+    /// </summary>
     [RequireComponent(typeof(CanvasGroup))]
     public class FadingLogMessage : MonoBehaviour
     {
@@ -34,6 +36,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             StartCoroutine(FadeOutCoroutine());
         }
     
+        /// <summary>
+        /// Coroutine to stay visible, fade out, and then destroy this object.
+        /// </summary>
         private IEnumerator FadeOutCoroutine()
         {
             // 1. Stay visible for the display duration
@@ -53,4 +58,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         }
     }
 }
-

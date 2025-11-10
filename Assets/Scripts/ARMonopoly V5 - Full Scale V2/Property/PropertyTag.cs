@@ -4,8 +4,8 @@ using UnityEngine;
 namespace ARMonopoly_V5___Full_Scale_V2.Property
 {
     /// <summary>
+    /// Links a property's Image Target in the scene to its ScriptableObject data.
     /// Attached to the Property's Image Target.
-    /// This component holds the reference to the property's data definition.
     /// </summary>
     [RequireComponent(typeof(PropertyVisuals))]
     public class PropertyTag : MonoBehaviour

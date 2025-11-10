@@ -1,4 +1,3 @@
-// In folder: ARMonopoly V5 - Full Scale V2/Gameplay/
 using System.Collections.Generic;
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
@@ -8,12 +7,18 @@ using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 {
+    /// <summary>
+    /// Manages the player turn order and dice rolling logic.
+    /// Attached to the [GameSystems] GameObject.
+    /// </summary>
     public class TurnController : MonoBehaviour
     {
         [Header("Config")]
+        [Tooltip("The order of PlayerIDs for turns (e.g., 1, 2)")]
         public List<int> PlayerOrder = new List<int>();
 
         [Header("Runtime")]
+        /// <summary>The PlayerID of the player whose turn it is.</summary>
         public int CurrentPlayerID { get; private set; }
 
         private int _turnIndex = -1;
@@ -23,6 +28,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
         private void Start()
         {
+            // Cache core system references
             _stateMachine = AppGame.Instance.StateMachine;
             _board = AppGame.Instance.Board;
 
@@ -31,7 +37,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             if (_stateMachine == null)
                 Debug.LogError("TurnController: StateMachine is null!");
             
-            // Cache player tags for easy access
+            // Cache all PlayerTag components in the scene for fast lookup
             foreach (var playerTag in FindObjectsOfType<PlayerTag>())
             {
                 if (playerTag != null)
@@ -46,7 +52,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         }
 
         /// <summary>
-        /// Called by the RollButton. This just starts the move.
+        /// Public method called by the RollButton UI.
         /// </summary>
         public void OnRollClicked()
         {
@@ -73,12 +79,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 return;
             }
 
-            // 3. Calculate new position
+            // 3. Calculate new logical position
             int newIndex = (oldIndex + roll) % boardSize;
-            player.CurrentBoardIndex = newIndex; // Update the player's logical position
+            player.CurrentBoardIndex = newIndex; // Update the player's logical state
 
             // 4. Check for "Pass Go"
-            if (newIndex < oldIndex) // They wrapped around
+            if (newIndex < oldIndex) // They wrapped around the board
             {
                 GameEvents.RaisePlayerPassedGo(CurrentPlayerID);
             }
@@ -107,7 +113,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         }
 
         /// <summary>
-        // This is called by RuleEngine AFTER a landing is resolved or passed.
+        /// Called by RuleEngine AFTER a landing is resolved or passed.
         /// </summary>
         public void EndTurn()
         {
@@ -117,9 +123,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 return;
             }
 
+            // Advance to the next player
             _turnIndex = (_turnIndex + 1) % PlayerOrder.Count;
             CurrentPlayerID = PlayerOrder[_turnIndex];
 
+            // Set state and fire events for the new turn
             _stateMachine.SetState(GameState.PlayerTurn);
             GameEvents.RaiseLogMessage($"--- Player {CurrentPlayerID}'s Turn Begins ---");
             GameEvents.RaiseTurnStarted(CurrentPlayerID);

@@ -1,14 +1,15 @@
-// In folder: ARMonopoly V5 - Full Scale V2/Spelling/
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Spelling
 {
     /// <summary>
-    /// Attach this to your letter Image Targets (A, B, C...)
-    /// to identify them as spelling letters.
+    /// Attach this component to your letter Image Targets (A, B, C...).
+    /// This identifies them as spelling letters for the ARCrosswordScanner.
+    /// Don't forget to also assign the "SpellingLetter" Unity Tag.
     /// </summary>
     public class LetterTag : MonoBehaviour
     {
+        [Tooltip("The letter this target represents.")]
         public char Letter;
     }
 }

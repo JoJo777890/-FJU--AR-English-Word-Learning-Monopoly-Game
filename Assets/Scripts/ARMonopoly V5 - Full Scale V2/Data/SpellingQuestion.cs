@@ -1,15 +1,19 @@
-// In folder: ARMonopoly V5 - Full Scale V2/Data/
-
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Data
 {
+    /// <summary>
+    /// ScriptableObject defining a single spelling question.
+    /// Create one from 'Assets > Create > ARMonopoly_V5___Full_Scale_V2 > Spelling Question'.
+    /// </summary>
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Spelling Question")]
     public class SpellingQuestion : ScriptableObject
     {
-        public string QuestionText; // e.g., "Spell the word for a red fruit."
-        public string CorrectAnswer; // e.g., "APPLE"
+        [Tooltip("The question text shown to the player (e.g., 'Spell the word for a red fruit.')")]
+        public string QuestionText;
+        [Tooltip("The correct answer (not case-sensitive).")]
+        public string CorrectAnswer;
+        [Tooltip("The fine amount if answered incorrectly on an unowned property.")]
         public int FineAmount = 50;
     }
 }
-

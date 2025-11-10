@@ -5,20 +5,25 @@ using UnityEngine;
 namespace ARMonopoly_V5___Full_Scale_V2.Board
 {
     /// <summary>
-    /// Defines the logical order of properties around the board.
-    /// Create one asset from 'Assets > Create > AR Monopoly > Board Definition'.
+    /// ScriptableObject that defines the logical sequence of properties on the board.
+    /// This is crucial for calculating movement.
+    /// Create one from 'Assets > Create > ARMonopoly_V5___Full_Scale_V2 > Board Definition'.
     /// </summary>
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Board Definition")]
     public class BoardDefinition : ScriptableObject
     {
-        [Tooltip("A list of all properties, in order, starting from 'Go'.")]
+        [Tooltip("The complete list of PropertyDef assets, in clockwise order, starting from 'Go'.")]
         public List<PropertyDef> PropertiesInOrder;
 
+        /// <summary>
+        /// Gets the total number of spaces on the board.
+        /// </summary>
         public int TotalSpaces => PropertiesInOrder.Count;
 
         /// <summary>
-        /// Gets the PropertyDef at a specific board index.
+        /// Gets the PropertyDef at a specific logical board index.
         /// </summary>
+        /// <param name="index">The board index (0 = Go).</param>
         public PropertyDef GetPropertyAt(int index)
         {
             if (PropertiesInOrder == null || TotalSpaces == 0) return null;
@@ -32,8 +37,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Board
         }
 
         /// <summary>
-        /// Finds the board index for a given property ID.
+        /// Finds the board index for a given property's unique string ID.
         /// </summary>
+        /// <returns>The index (0 to TotalSpaces-1), or -1 if not found.</returns>
         public int GetIndexFromID(string propertyID)
         {
             if (PropertiesInOrder == null) return -1;

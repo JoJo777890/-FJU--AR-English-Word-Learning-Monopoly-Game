@@ -7,9 +7,9 @@ using Vuforia;
 namespace ARMonopoly_V5___Full_Scale_V2.Player
 {
     /// <summary>
+    /// Handles AR proximity detection for this player token.
+    /// Fires proximity events, but does not control visuals.
     /// Attached to the Player's Image Target.
-    /// Detects proximity to properties and fires events.
-    /// Does NOT control scaling.
     /// </summary>
     [RequireComponent(typeof(PlayerTag), typeof(ObserverBehaviour))]
     public class PlayerTokenTrigger : MonoBehaviour
@@ -18,9 +18,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         private ObserverBehaviour _playerObserver;
         private GameConfig _config;
 
-        // Tracks which property this player is currently "in"
+        // Tracks which property this player is currently "in" to avoid firing events every frame.
         private string _currentProximityID = null;
 
+        /// <summary>
+        /// Caches required components and GameConfig.
+        /// </summary>
         void Start()
         {
             _playerTag = GetComponent<PlayerTag>();
@@ -37,6 +40,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
                 Debug.LogError($"PlayerTokenTrigger (P{_playerTag.PlayerID}): GameConfig not found!");
         }
 
+        /// <summary>
+        /// Finds the closest tracked property and checks if it's within trigger distance.
+        /// </summary>
         void Update()
         {
             if (_playerObserver == null || _config == null || _playerTag == null) return;
@@ -45,14 +51,14 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
             if (_playerObserver.TargetStatus.Status < Status.TRACKED)
             {
                 // If we were near a property and lost tracking, fire an exit event
-                HandleProximityExit(null); // Pass null to signify an "exit all"
+                HandleProximityExit(_currentProximityID);
                 return;
             }
 
             PropertyTag closestProp = null;
             float closestDist = float.MaxValue;
 
-            // Find the closest *tracked* property
+            // Find the closest *tracked* property from the static list in PropertyVisuals
             foreach (var prop in PropertyVisuals.AllTrackedProperties)
             {
                 if (prop == null) continue; // Safety check
@@ -68,8 +74,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
             // Check if the closest property is within range
             if (closestProp != null && closestDist < _config.TriggerDistance)
             {
-                // We are close to a property
-                if (_currentProximityID != closestProp.PropertyID) // <-- FIXED
+                // We are close to a property.
+                if (_currentProximityID != closestProp.PropertyID)
                 {
                     // This is a NEW property, fire exit for the old and enter for the new
                     HandleProximityExit(_currentProximityID);
@@ -78,23 +84,30 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
             }
             else
             {
-                // We are not close to any property
+                // We are not close to any property, fire an exit for the current one
                 HandleProximityExit(_currentProximityID);
             }
         }
 
+        /// <summary>
+        /// Fires the OnProximityEnter event and updates the current proximity ID.
+        /// </summary>
         private void HandleProximityEnter(PropertyTag prop)
         {
-            _currentProximityID = prop.PropertyID; // <-- FIXED
+            _currentProximityID = prop.PropertyID;
             GameEvents.RaiseProximityEnter(new ProximityPayload
             {
                 PlayerID = _playerTag.PlayerID,
-                PropertyID = prop.PropertyID // <-- FIXED
+                PropertyID = prop.PropertyID
             });
         }
 
+        /// <summary>
+        /// Fires the OnProximityExit event and clears the current proximity ID.
+        /// </summary>
         private void HandleProximityExit(string oldPropertyID)
         {
+            // Only fire an exit event if we were actually *in* a proximity zone
             if (string.IsNullOrEmpty(oldPropertyID)) return;
             
             _currentProximityID = null;
@@ -106,4 +119,3 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         }
     }
 }
-

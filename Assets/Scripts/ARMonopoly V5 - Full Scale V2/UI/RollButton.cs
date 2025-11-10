@@ -6,7 +6,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 {
     /// <summary>
     /// A simple helper script to find the TurnController and call OnRollClicked.
-    /// Attach this to your "Roll" button.
+    /// Attach this to your "Roll" button GameObject.
     /// </summary>
     [RequireComponent(typeof(Button))]
     public class RollButton : MonoBehaviour
@@ -31,6 +31,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             _button.onClick.AddListener(OnClick);
         }
 
+        /// <summary>
+        /// Called by the button's OnClick event.
+        /// </summary>
         public void OnClick()
         {
             if (_turnController != null)

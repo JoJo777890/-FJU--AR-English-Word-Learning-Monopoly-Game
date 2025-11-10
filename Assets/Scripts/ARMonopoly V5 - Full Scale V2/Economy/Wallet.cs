@@ -16,8 +16,14 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             Money = startingMoney;
         }
 
+        /// <summary>
+        /// Gets the current balance of the wallet.
+        /// </summary>
         public int GetBalance() => Money;
 
+        /// <summary>
+        /// Adds money to the wallet and raises the OnMoneyChanged event.
+        /// </summary>
         public bool Add(int amount)
         {
             if (amount < 0) return false;
@@ -26,18 +32,15 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
             return true;
         }
 
+        /// <summary>
+        /// Removes money from the wallet and raises the OnMoneyChanged event.
+        /// </summary>
         public bool Remove(int amount)
         {
             if (amount < 0) return false;
-            if (Money < amount)
-            {
-                // Not enough money, but we'll allow it for now
-                // (or return false;)
-                Money -= amount;
-                GameEvents.RaiseMoneyChanged(PlayerID, Money);
-                return true; // Or false, depending on game rules
-            }
 
+            // TODO: Implement proper bankruptcy logic instead of allowing a negative balance.
+            // For now, we allow the balance to go negative.
             Money -= amount;
             GameEvents.RaiseMoneyChanged(PlayerID, Money);
             return true;
