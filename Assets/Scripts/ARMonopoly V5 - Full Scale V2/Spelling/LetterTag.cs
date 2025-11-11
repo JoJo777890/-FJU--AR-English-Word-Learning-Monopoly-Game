@@ -9,7 +9,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
     /// </summary>
     public class LetterTag : MonoBehaviour
     {
-        [Tooltip("The letter this target represents.")]
+        // (Tip): The letter this target represents.
         public char Letter;
     }
 }

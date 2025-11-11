@@ -10,7 +10,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Database")]
     public class PropertyDatabase : ScriptableObject
     {
-        [Tooltip("A list of all PropertyDef assets in the game.")]
+        // (Tip): A list of all PropertyDef assets in the game.
         public List<PropertyDef> AllProperties;
 
         // Internal dictionary for fast O(1) lookups by string ID

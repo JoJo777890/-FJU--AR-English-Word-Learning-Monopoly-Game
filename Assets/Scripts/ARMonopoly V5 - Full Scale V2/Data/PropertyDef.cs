@@ -9,7 +9,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Property Definition")]
     public class PropertyDef : ScriptableObject
     {
-        [Tooltip("Unique ID (e.g., 'BOARDWALK') used for lookups.")]
+        // (Tip): Unique ID (e.g., 'BOARDWALK') used for lookups.
         public string PropertyID;
         
         /// <summary>The display name for the UI.</summary>

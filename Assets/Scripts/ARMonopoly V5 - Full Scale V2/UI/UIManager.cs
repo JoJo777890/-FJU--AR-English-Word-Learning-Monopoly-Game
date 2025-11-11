@@ -15,18 +15,18 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
     public class UIManager : MonoBehaviour
     {
         [Header("State Panels")]
-        [Tooltip("Panel for prompting property purchase.")]
+        // (Tip): Panel for prompting property purchase.
         public GameObject BuyPanel;
-        [Tooltip("Panel that instructs the player to move their token.")]
+        // (Tip): Panel that instructs the player to move their token.
         public GameObject MoveNotificationPanel;
-        [Tooltip("Panel for the spelling challenge and investment.")]
+        // (Tip): Panel for the spelling challenge and investment.
         public GameObject SpellingPanel; 
 
         [Header("HUD")]
         public Button RollButton;
         public TextMeshProUGUI TurnText;
         public TextMeshProUGUI DiceRollText;
-        [Tooltip("List of text elements for player money, index 0 = Player 1, index 1 = Player 2, etc.")]
+        // (Tip): List of text elements for player money, index 0 = Player 1, index 1 = Player 2, etc.
         public List<TextMeshProUGUI> MoneyTexts;
 
         [Header("Buy Panel")]
@@ -42,19 +42,19 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         public TMP_InputField SpellingAnswerInput;
         public Button SpellingSubmitButton;
         public Button ScanAnswerButton;
-        [Tooltip("Buttons for other players to invest. Index 0 = P1, 1 = P2, etc.")]
+        // (Tip): Buttons for other players to invest. Index 0 = P1, 1 = P2, etc.
         public Button[] InvestmentButtons; 
-        [Tooltip("Reference to the ARCrosswordScanner in the scene.")]
+        // (Tip): Reference to the ARCrosswordScanner in the scene.
         public ARCrosswordScanner crosswordScanner;
 
         [Header("Log")]
-        [Tooltip("The persistent, scrolling log text field.")]
+        // (Tip): The persistent, scrolling log text field.
         public TextMeshProUGUI LogText;
         
         [Header("Fading Log")]
-        [Tooltip("The prefab for the fading pop-up log message.")]
+        // (Tip): The prefab for the fading pop-up log message.
         public GameObject fadingLogPrefab;
-        [Tooltip("The UI container to instantiate fading logs into.")]
+        // (Tip): The UI container to instantiate fading logs into.
         public Transform fadingLogContainer;
 
         private string _pendingBuyPropertyID;

@@ -18,15 +18,15 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public static AppGame Instance { get; private set; }
 
         [Header("Data Assets")]
-        [Tooltip("Global game settings (starting money, etc.)")]
+        // (Tip): Global game settings (starting money, etc.)
         public GameConfig Config;
-        [Tooltip("Database of all PropertyDef assets for easy lookup.")]
+        // (Tip): Database of all PropertyDef assets for easy lookup.
         public PropertyDatabase PropertyDB;
-        [Tooltip("ScriptableObject defining the board's logical layout and order.")]
+        // (Tip): ScriptableObject defining the board's logical layout and order.
         public BoardDefinition Board;
-        [Tooltip("ScriptableObject holding the rent calculation logic.")]
+        // (Tip): ScriptableObject holding the rent calculation logic.
         public RentCalculator RentCalculator;
-        [Tooltip("Database of all SpellingQuestion assets.")]
+        // (Tip): Database of all SpellingQuestion assets.
         public SpellingQuestionDatabase SpellingDB;
 
         [Header("Core Systems")]
@@ -36,7 +36,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public GameStateMachine StateMachine { get; private set; }
 
         [Header("Runtime State")]
-        [Tooltip("The destination property ID the current player is expected to move to.")]
+        // (Tip): The destination property ID the current player is expected to move to.
         public string ExpectedDestinationPropertyID;
 
         void Awake()

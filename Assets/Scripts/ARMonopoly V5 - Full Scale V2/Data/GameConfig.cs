@@ -19,7 +19,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
         /// <summary>The distance (in meters) to trigger proximity events.</summary>
         public float TriggerDistance = 0.1f;
         /// <summary>The name suffix of the child GameObject to scale (e.g., 'Model', 'Plane').</summary>
-        [Tooltip("The name suffix of the child GameObject to scale (e.g., 'Model', 'Plane')")]
+        // (Tip): The name suffix of the child GameObject to scale (e.g., 'Model', 'Plane')
         public string ContentSuffix = "Plane";
         /// <summary>The multiplier for scaling up visuals on proximity.</summary>
         public float ScaleUpFactor = 1.3f;

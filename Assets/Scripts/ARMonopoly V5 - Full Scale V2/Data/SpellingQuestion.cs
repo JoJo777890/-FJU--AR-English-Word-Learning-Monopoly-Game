@@ -9,11 +9,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Spelling Question")]
     public class SpellingQuestion : ScriptableObject
     {
-        [Tooltip("The question text shown to the player (e.g., 'Spell the word for a red fruit.')")]
+        // (Tip): The question text shown to the player (e.g., 'Spell the word for a red fruit.')
         public string QuestionText;
-        [Tooltip("The correct answer (not case-sensitive).")]
+        // (Tip): The correct answer (not case-sensitive).
         public string CorrectAnswer;
-        [Tooltip("The fine amount if answered incorrectly on an unowned property.")]
+        // (Tip): The fine amount if answered incorrectly on an unowned property.
         public int FineAmount = 50;
     }
 }

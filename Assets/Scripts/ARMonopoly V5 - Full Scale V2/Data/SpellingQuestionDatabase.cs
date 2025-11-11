@@ -10,7 +10,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Spelling Question Database")]
     public class SpellingQuestionDatabase : ScriptableObject
     {
-        [Tooltip("The list of all possible spelling questions.")]
+        // (Tip): The list of all possible spelling questions.
         public List<SpellingQuestion> AllQuestions;
     
         /// <summary>

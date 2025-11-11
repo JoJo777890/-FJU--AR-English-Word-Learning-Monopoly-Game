@@ -14,7 +14,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
     public class TurnController : MonoBehaviour
     {
         [Header("Config")]
-        [Tooltip("The order of PlayerIDs for turns (e.g., 1, 2)")]
+        // (Tip): The order of PlayerIDs for turns (e.g., 1, 2)
         public List<int> PlayerOrder = new List<int>();
 
         [Header("Runtime")]

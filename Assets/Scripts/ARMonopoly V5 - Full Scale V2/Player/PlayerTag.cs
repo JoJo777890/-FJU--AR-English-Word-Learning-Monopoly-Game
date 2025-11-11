@@ -14,11 +14,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         public int PlayerID;
         public string PlayerName;
 
-        [Tooltip("The property the player starts on (e.g., 'Go')")]
+        // (Tip): The property the player starts on (e.g., 'Go')
         public PropertyDef StartingProperty;
 
         [Header("Runtime")]
-        [Tooltip("The player's current logical index on the board (0 = Go).")]
+        // (Tip): The player's current logical index on the board (0 = Go).
         public int CurrentBoardIndex = 0;
 
         private void Start()

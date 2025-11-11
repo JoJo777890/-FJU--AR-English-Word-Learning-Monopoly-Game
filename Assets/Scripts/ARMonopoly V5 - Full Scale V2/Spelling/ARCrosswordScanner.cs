@@ -10,7 +10,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Spelling
     /// </summary>
     public class ARCrosswordScanner : MonoBehaviour
     {
-        [Tooltip("Positional threshold to group letters into the same line (in meters).")]
+        // (Tip): Positional threshold to group letters into the same line (in meters).
         public float groupThreshold = 0.02f;
 
         /// <summary>

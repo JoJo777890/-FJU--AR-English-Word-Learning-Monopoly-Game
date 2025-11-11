@@ -10,7 +10,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
     [RequireComponent(typeof(PropertyVisuals))]
     public class PropertyTag : MonoBehaviour
     {
-        [Tooltip("The ScriptableObject asset that defines this property (e.g., 'Boardwalk_Def').")]
+        // (Tip): The ScriptableObject asset that defines this property (e.g., 'Boardwalk_Def').
         public PropertyDef Definition;
 
         /// <summary>
