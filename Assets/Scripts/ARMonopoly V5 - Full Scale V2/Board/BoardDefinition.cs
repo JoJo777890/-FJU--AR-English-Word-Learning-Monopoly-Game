@@ -12,7 +12,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Board
     [CreateAssetMenu(menuName = "ARMonopoly_V5___Full_Scale_V2/Board Definition")]
     public class BoardDefinition : ScriptableObject
     {
-        [Tooltip("The complete list of PropertyDef assets, in clockwise order, starting from 'Go'.")]
+        // The complete list of PropertyDef assets, in clockwise order, starting from 'Go'
         public List<PropertyDef> PropertiesInOrder;
 
         /// <summary>
