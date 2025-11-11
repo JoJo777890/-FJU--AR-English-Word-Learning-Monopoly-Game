@@ -148,7 +148,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
                     InvestmentButtons[i].onClick.RemoveAllListeners();
                     int capturedInvestorID = playerID; // Capture variable for closure
                     InvestmentButtons[i].onClick.AddListener(() => {
-                        GameEvents.RaisePlayerInvest(new InvestmentPayload { InvestorID = capturedInvestorID, TargetPlayerID = tc.CurrentPlayerID });
+                        GameEvents.RaisePlayerInvest(new InvestmentPayload
+                        {
+                            InvestorID = capturedInvestorID, 
+                            TargetPlayerID = tc.CurrentPlayerID
+                        });
                         InvestmentButtons[capturedInvestorID - 1].gameObject.SetActive(false); // Disable after investing
                     });
                 }
@@ -206,8 +210,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             _pendingBuyPropertyID = payload.PropertyID;
             BuyPromptText.text = $"Player {payload.PlayerID}, buy {payload.PropertyName} for ${payload.Price}?";
         }
-
-        // These handlers are empty because the log message is raised by the source (RuleEngine, Bank)
+        
         private void OnPlayerPassedGo(int pid) { } 
         private void HandlePropertyBought(PropertyPayload payload) { } 
         private void HandleRentPaid(RentPayload payload) { } 

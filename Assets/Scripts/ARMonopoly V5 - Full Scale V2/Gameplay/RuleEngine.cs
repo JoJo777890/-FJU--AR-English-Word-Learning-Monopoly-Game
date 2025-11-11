@@ -164,8 +164,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     GameEvents.RaiseLogMessage("Player can now buy the property.");
                     GameEvents.RaiseBuyPrompt(new BuyPayload
                     {
-                        PlayerID = currentPlayerID, PropertyID = prop.PropertyID,
-                        PropertyName = prop.DisplayName, Price = prop.Price
+                        PlayerID = currentPlayerID, 
+                        PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, 
+                        Price = prop.Price
                     });
                     // Turn ends when player Buys or Passes via HandleBuyRequest or UIManager.OnBuyPass
                 }
@@ -197,8 +199,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     // Bank's TransferRent method raises its own log message
                     GameEvents.RaiseRentPaid(new RentPayload
                     {
-                        PayerID = currentPlayerID, OwnerID = ownerID, PropertyID = prop.PropertyID,
-                        PropertyName = prop.DisplayName, Amount = rentAmount
+                        PayerID = currentPlayerID, 
+                        OwnerID = ownerID, 
+                        PropertyID = prop.PropertyID,
+                        PropertyName = prop.DisplayName, 
+                        Amount = rentAmount
                     });
                      _turnController.EndTurn();
                 }
