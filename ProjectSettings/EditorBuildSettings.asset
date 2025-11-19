@@ -28,8 +28,11 @@ EditorBuildSettings:
     path: Assets/Scenes/MonopolyTestground7 - Intergrate Monopoly Core Function -
       Turns Dice_BuyRent Ownership_ChanceChest-cards_Jail.unity
     guid: 61465abb2640330409ac617a514823f2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MonopolyTestground9 - Full-Scale Start V2.unity
     guid: a3ab99f7f4e552b4d92c69fa3f683d5d
+  - enabled: 1
+    path: Assets/Scenes/Dice Cube Demo.unity
+    guid: 7a20cf9db4011e1449f7eb99db41b3af
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
