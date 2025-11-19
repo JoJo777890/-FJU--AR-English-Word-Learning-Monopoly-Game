@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="Dice_6---Patterned" size="0.050000 0.050000" />
+    <ImageTarget name="Dice_5---Patterned" size="0.050000 0.050000" />
+    <ImageTarget name="Dice_4---Patterned" size="0.050000 0.050000" />
+    <ImageTarget name="Dice_3---Patterned" size="0.050000 0.050000" />
+    <ImageTarget name="Dice_2---Patterned" size="0.050000 0.050000" />
+    <ImageTarget name="Dice_1---Patterned" size="0.050000 0.050000" />
+  </Tracking>
+</QCARConfig>
