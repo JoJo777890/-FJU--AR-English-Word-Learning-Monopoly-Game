@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f557a64c3ccfe24f9415fd418ad66ca, type: 3}
   m_Name: Dice_4
   m_EditorClassIdentifier: 
-  VuforiaTargetName: 
-  DiceValue: 0
+  VuforiaTargetName: ImageTarget_Dice_4
+  DiceValue: 4
