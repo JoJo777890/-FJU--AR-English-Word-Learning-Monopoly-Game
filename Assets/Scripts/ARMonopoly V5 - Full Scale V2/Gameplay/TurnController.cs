@@ -11,6 +11,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
     /// Manages the player turn order and dice rolling logic.
     /// Attached to the [GameSystems] GameObject.
     /// </summary>
+    [RequireComponent(typeof(DiceScanner))] // Ensure DiceScanner is on this object
     public class TurnController : MonoBehaviour
     {
         [Header("Config")]
@@ -25,17 +26,21 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private GameStateMachine _stateMachine;
         private Dictionary<int, PlayerTag> _playerTags = new Dictionary<int, PlayerTag>();
         private BoardDefinition _board;
+        private DiceScanner _diceScanner; // <-- I added: Reference to the scanner
 
         private void Start()
         {
             // Cache core system references
             _stateMachine = AppGame.Instance.StateMachine;
             _board = AppGame.Instance.Board;
+            _diceScanner = GetComponent<DiceScanner>(); // <-- I added: Get the scanner
 
             if (_board == null)
                 Debug.LogError("TurnController: BoardDefinition is not assigned in AppGame!");
             if (_stateMachine == null)
                 Debug.LogError("TurnController: StateMachine is null!");
+            if (_diceScanner == null)
+                Debug.LogError("TurnController: DiceScanner component not found!");
             
             // Cache all PlayerTag components in the scene for fast lookup
             foreach (var playerTag in FindObjectsOfType<PlayerTag>())
@@ -50,18 +55,45 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             // Start the first turn
             EndTurn();
         }
+        
+        // --- I added: Subscribe to the dice roll event ---
+        private void OnEnable()
+        {
+            GameEvents.OnDiceRolled += HandleDiceRoll;
+        }
+
+        private void OnDisable()
+        {
+            GameEvents.OnDiceRolled -= HandleDiceRoll;
+        }
 
         /// <summary>
         /// Public method called by the RollButton UI.
+        /// This now *starts* the scan, it doesn't calculate the roll.
         /// </summary>
         public void OnRollClicked()
         {
             if (_stateMachine.CurrentState != GameState.PlayerTurn) return;
 
-            // 1. Roll Dice
-            int roll = Random.Range(1, 7) + Random.Range(1, 7);
-            GameEvents.RaiseDiceRolled(CurrentPlayerID, roll);
-            GameEvents.RaiseLogMessage($"Player {CurrentPlayerID} rolled a {roll}.");
+            // 1. Change state to AwaitingDiceRoll
+            _stateMachine.SetState(GameState.AwaitingDiceRoll);
+            
+            // 2. Tell the scanner to start looking
+            _diceScanner.StartScan(CurrentPlayerID);
+        }
+
+        /// <summary>
+        /// This method now runs *after* the DiceScanner fires OnDiceRolled.
+        /// </summary>
+        private void HandleDiceRoll(int playerID, int totalRoll)
+        {
+            // Only react if it's the current player's roll
+            if (playerID != CurrentPlayerID) return;
+            
+            // Log the physical roll
+            GameEvents.RaiseLogMessage($"Player {CurrentPlayerID} rolled a {totalRoll}.");
+
+            // --- This is the logic moved from the old OnRollClicked ---
 
             // 2. Get Player's current position
             if (!_playerTags.ContainsKey(CurrentPlayerID))
@@ -79,8 +111,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 return;
             }
 
-            // 3. Calculate new logical position
-            int newIndex = (oldIndex + roll) % boardSize;
+            // 3. Calculate new logical position (using the physical 'totalRoll')
+            int newIndex = (oldIndex + totalRoll) % boardSize;
             player.CurrentBoardIndex = newIndex; // Update the player's logical state
 
             // 4. Check for "Pass Go"
@@ -111,6 +143,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             // 7. Change state to wait for the physical move
             _stateMachine.SetState(GameState.AwaitingPlayerMove);
         }
+
 
         /// <summary>
         /// Called by RuleEngine AFTER a landing is resolved or passed.

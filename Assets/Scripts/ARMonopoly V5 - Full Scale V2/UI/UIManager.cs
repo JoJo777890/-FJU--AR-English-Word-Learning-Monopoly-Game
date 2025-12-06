@@ -21,6 +21,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         public GameObject MoveNotificationPanel;
         // (Tip): Panel for the spelling challenge and investment.
         public GameObject SpellingPanel; 
+        
+        // --- NEW UI PANEL ---
+        [Tooltip("Panel that instructs the player to roll their physical die.")]
+        public GameObject RollDicePromptPanel; 
 
         [Header("HUD")]
         public Button RollButton;
@@ -73,6 +77,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             BuyPanel.SetActive(false);
             MoveNotificationPanel.SetActive(true); // Keep this on by default
             SpellingPanel.SetActive(false);
+            if(RollDicePromptPanel) RollDicePromptPanel.SetActive(false); // <-- NEW
         }
 
         /// <summary>
@@ -119,9 +124,17 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         private void HandleStateChanged(GameState newState)
         {
             RollButton.interactable = (newState == GameState.PlayerTurn);
-            // MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove);
+            // MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove); // This is handled by HandleTurnStarted/HandleMoveRequired
             BuyPanel.SetActive(newState == GameState.ResolvingSpace || newState == GameState.ResolvingSpelling);
             SpellingPanel.SetActive(newState == GameState.AwaitingSpellingAnswer);
+            
+            // --- I added ---
+            if(RollDicePromptPanel) RollDicePromptPanel.SetActive(newState == GameState.AwaitingDiceRoll);
+            if (newState == GameState.AwaitingDiceRoll)
+            {
+                MoveNotificationPanel.SetActive(false); // Hide move panel while rolling
+            }
+            // --- END I added ---
         }
         
         /// <summary>
@@ -168,6 +181,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void HandleTurnStarted(int playerID) 
         {
+            MoveNotificationPanel.SetActive(true); // Show this by default
             MoveNotificationText.text = $"Player {playerID}, please roll the dice!";
             TurnText.text = $"Player {playerID}'s Turn";
             DiceRollText.text = "Roll the dice!";
@@ -186,6 +200,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void HandleMoveRequired(MovePayload payload) 
         {
+            MoveNotificationPanel.SetActive(true); // Ensure it's visible
             MoveNotificationText.text = $"Player {payload.PlayerID}, please move to:\n{payload.DestinationName}";
         }
         
@@ -209,6 +224,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         {
             _pendingBuyPropertyID = payload.PropertyID;
             BuyPromptText.text = $"Player {payload.PlayerID}, buy {payload.PropertyName} for ${payload.Price}?";
+            
+            // --- NEW ---
+            // Hide the move notification panel when the buy prompt appears
+            MoveNotificationPanel.SetActive(false);
+            // --- END NEW ---
         }
         
         private void OnPlayerPassedGo(int pid) { } 
