@@ -215,7 +215,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
     public struct SpellingQuestionPayload 
     {
         public int PlayerID; 
-        public Data.SpellingQuestion Question; 
+        public SpellingQuestion Question; 
         public string PropertyID;
     }
     
