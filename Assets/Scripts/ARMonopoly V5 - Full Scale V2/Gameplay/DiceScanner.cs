@@ -26,6 +26,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private Dictionary<string, int> _faceValueMap = new Dictionary<string, int>();
         private ObserverBehaviour[] _allObservers;
         private bool _isScanning = false;
+        private bool _waitingForClearance = false;
         private int _currentPlayerID;
 
         // Dwell time tracking
@@ -54,18 +55,47 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             _currentPlayerID = playerID;
             _isScanning = true;
             _rollVotes.Clear();
-            GameEvents.RaiseLogMessage("Please roll your physical die.");
+            
+            // --- CLEARANCE CHECK ---
+            // Check if we can see a die RIGHT NOW. 
+            // If yes, we must wait for the player to pick it up (break tracking) 
+            // before we accept a new roll.
+            if (IsAnyFaceTracked())
+            {
+                _waitingForClearance = true;
+                GameEvents.RaiseLogMessage("Please pick up the dice to roll!");
+            }
+            else
+            {
+                _waitingForClearance = false;
+                GameEvents.RaiseLogMessage("Roll the dice now!");
+            }
         }
 
         private void StopScan()
         {
             _isScanning = false;
+            _waitingForClearance = false;
         }
 
         void Update()
         {
             if (!_isScanning) return;
 
+            // --- 1. HANDLE CLEARANCE ---
+            if (_waitingForClearance)
+            {
+                // We are waiting for the player to pick up the old dice.
+                // We stay in this state until NO dice are tracked.
+                if (!IsAnyFaceTracked())
+                {
+                    _waitingForClearance = false;
+                    GameEvents.RaiseLogMessage("Dice cleared. Rolling...");
+                }
+                return; // Don't process any rolls yet
+            }
+
+            // --- 2. NORMAL SCANNING ---
             float bestAlignment = -1.0f;
             ObserverBehaviour faceUpTarget = null;
 
@@ -118,6 +148,22 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 // This ensures we only accept a roll when the die settles flat.
                 _rollVotes.Clear();
             }
+        }
+        
+        /// <summary>
+        /// Helper to check if ANY of our die faces are currently visible.
+        /// </summary>
+        private bool IsAnyFaceTracked()
+        {
+            foreach (var observer in _allObservers)
+            {
+                if (_faceValueMap.ContainsKey(observer.gameObject.name) && 
+                    observer.TargetStatus.Status == Status.TRACKED)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
