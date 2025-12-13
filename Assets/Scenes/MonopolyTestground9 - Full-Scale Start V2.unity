@@ -4115,7 +4115,7 @@ GameObject:
   - component: {fileID: 793539621}
   - component: {fileID: 793539618}
   m_Layer: 5
-  m_Name: RollButton
+  m_Name: StartTurnRollButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4815,7 +4815,7 @@ GameObject:
   - component: {fileID: 937571752}
   - component: {fileID: 937571751}
   m_Layer: 5
-  m_Name: RollLabel
+  m_Name: StartTurnRollLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4860,7 +4860,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: (Roll Dice)
+  m_text: (Start Turn)
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

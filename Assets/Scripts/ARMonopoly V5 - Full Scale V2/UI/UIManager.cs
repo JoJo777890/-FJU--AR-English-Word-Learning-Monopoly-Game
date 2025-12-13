@@ -184,7 +184,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             MoveNotificationPanel.SetActive(true); // Show this by default
             MoveNotificationText.text = $"Player {playerID}, please roll the dice!";
             TurnText.text = $"Player {playerID}'s Turn";
-            DiceRollText.text = "Roll the dice!";
+            DiceRollText.text = $"Start Turn!";
         }
         
         /// <summary>
