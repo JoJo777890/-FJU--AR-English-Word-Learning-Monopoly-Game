@@ -21,7 +21,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         /// <summary>
         /// Player has clicked "Roll", waiting for physical die scan.
         /// </summary>
-        AwaitingDiceRoll, // <-- I added: New Dice State
+        AwaitingDiceRoll,
         
         /// <summary>
         /// Player has rolled, waiting for their physical token to move to the destination.

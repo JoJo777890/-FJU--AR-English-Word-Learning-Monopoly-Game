@@ -22,7 +22,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         // (Tip): Panel for the spelling challenge and investment.
         public GameObject SpellingPanel; 
         
-        // --- NEW UI PANEL ---
         [Tooltip("Panel that instructs the player to roll their physical die.")]
         public GameObject RollDicePromptPanel; 
 
@@ -225,10 +224,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             _pendingBuyPropertyID = payload.PropertyID;
             BuyPromptText.text = $"Player {payload.PlayerID}, buy {payload.PropertyName} for ${payload.Price}?";
             
-            // --- NEW ---
             // Hide the move notification panel when the buy prompt appears
             MoveNotificationPanel.SetActive(false);
-            // --- END NEW ---
         }
         
         private void OnPlayerPassedGo(int pid) { } 
