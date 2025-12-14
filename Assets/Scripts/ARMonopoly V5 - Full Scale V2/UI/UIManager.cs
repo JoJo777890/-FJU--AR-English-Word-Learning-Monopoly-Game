@@ -181,7 +181,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         private void HandleTurnStarted(int playerID) 
         {
             MoveNotificationPanel.SetActive(true); // Show this by default
-            MoveNotificationText.text = $"Player {playerID}, please roll the dice!";
+            MoveNotificationText.text = $"Player {playerID}, please hit the \"Start Turn!\" button!";
             TurnText.text = $"Player {playerID}'s Turn";
             DiceRollText.text = $"Start Turn!";
         }
