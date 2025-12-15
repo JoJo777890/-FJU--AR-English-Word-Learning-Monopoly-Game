@@ -61,6 +61,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         public Transform fadingLogContainer;
 
         private string _pendingBuyPropertyID;
+        private TurnController _turnController;
 
         /// <summary>
         /// Caches references and hooks up permanent button listeners.
@@ -74,11 +75,19 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
 
             // Set initial UI state
             BuyPanel.SetActive(false);
-            MoveNotificationPanel.SetActive(true); // Keep this on by default
+            MoveNotificationPanel.SetActive(true);
             SpellingPanel.SetActive(false);
-            if(RollDicePromptPanel) RollDicePromptPanel.SetActive(false); // <-- NEW
+            if(RollDicePromptPanel) RollDicePromptPanel.SetActive(false);
         }
 
+        /// <summary>
+        /// Injection Method.
+        /// </summary>
+        public void Construct(TurnController turnController)
+        {
+            _turnController = turnController;
+        }
+        
         /// <summary>
         /// Subscribes to all game events.
         /// </summary>
@@ -90,10 +99,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             GameEvents.OnDiceRolled += HandleDiceRolled;
             GameEvents.OnMoneyChanged += HandleMoneyChanged;
             GameEvents.OnBuyPrompt += HandleBuyPrompt;
-            GameEvents.OnPropertyBought += HandlePropertyBought;
-            GameEvents.OnRentPaid += HandleRentPaid;
             GameEvents.OnMoveRequired += HandleMoveRequired;
-            GameEvents.OnPlayerPassedGo += OnPlayerPassedGo;
             GameEvents.OnSpellingQuestion += HandleSpellingQuestion;
         }
 
@@ -108,14 +114,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             GameEvents.OnDiceRolled -= HandleDiceRolled;
             GameEvents.OnMoneyChanged -= HandleMoneyChanged;
             GameEvents.OnBuyPrompt -= HandleBuyPrompt;
-            GameEvents.OnPropertyBought -= HandlePropertyBought;
-            GameEvents.OnRentPaid -= HandleRentPaid;
             GameEvents.OnMoveRequired -= HandleMoveRequired;
-            GameEvents.OnPlayerPassedGo -= OnPlayerPassedGo;
             GameEvents.OnSpellingQuestion -= HandleSpellingQuestion;
         }
-
-        #region Event Handlers
 
         /// <summary>
         /// Updates UI visibility based on the new game state.
@@ -123,17 +124,17 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         private void HandleStateChanged(GameState newState)
         {
             RollButton.interactable = (newState == GameState.PlayerTurn);
-            // MoveNotificationPanel.SetActive(newState == GameState.AwaitingPlayerMove); // This is handled by HandleTurnStarted/HandleMoveRequired
             BuyPanel.SetActive(newState == GameState.ResolvingSpace || newState == GameState.ResolvingSpelling);
             SpellingPanel.SetActive(newState == GameState.AwaitingSpellingAnswer);
-            
-            // --- I added ---
-            if(RollDicePromptPanel) RollDicePromptPanel.SetActive(newState == GameState.AwaitingDiceRoll);
+
+            if (RollDicePromptPanel)
+            {
+                RollDicePromptPanel.SetActive(newState == GameState.AwaitingDiceRoll);
+            }
             if (newState == GameState.AwaitingDiceRoll)
             {
                 MoveNotificationPanel.SetActive(false); // Hide move panel while rolling
             }
-            // --- END I added ---
         }
         
         /// <summary>
@@ -150,20 +151,20 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
             SpellingAnswerInput.gameObject.SetActive(true); 
 
             // Configure investment buttons
-            TurnController tc = FindObjectOfType<TurnController>();
+            if (_turnController == null) return;
             for(int i = 0; i < InvestmentButtons.Length; i++)
             {
                 int playerID = i + 1; // Assumes player IDs are 1-based
-                if (playerID != tc.CurrentPlayerID)
+                if (playerID != _turnController.CurrentPlayerID)
                 {
                     InvestmentButtons[i].gameObject.SetActive(true);
                     InvestmentButtons[i].onClick.RemoveAllListeners();
-                    int capturedInvestorID = playerID; // Capture variable for closure
+                    int capturedInvestorID = playerID;
                     InvestmentButtons[i].onClick.AddListener(() => {
                         GameEvents.RaisePlayerInvest(new InvestmentPayload
                         {
                             InvestorID = capturedInvestorID, 
-                            TargetPlayerID = tc.CurrentPlayerID
+                            TargetPlayerID = _turnController.CurrentPlayerID
                         });
                         InvestmentButtons[capturedInvestorID - 1].gameObject.SetActive(false); // Disable after investing
                     });
@@ -199,7 +200,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void HandleMoveRequired(MovePayload payload) 
         {
-            MoveNotificationPanel.SetActive(true); // Ensure it's visible
+            MoveNotificationPanel.SetActive(true);
             MoveNotificationText.text = $"Player {payload.PlayerID}, please move to:\n{payload.DestinationName}";
         }
         
@@ -208,7 +209,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void HandleMoneyChanged(int playerID, int newBalance)
         {
-            int moneyIndex = playerID - 1; // Assumes Player 1 is at index 0
+            int moneyIndex = playerID - 1;
             if (moneyIndex >= 0 && moneyIndex < MoneyTexts.Count)
             {
                 if (MoneyTexts[moneyIndex] != null)
@@ -223,18 +224,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         {
             _pendingBuyPropertyID = payload.PropertyID;
             BuyPromptText.text = $"Player {payload.PlayerID}, buy {payload.PropertyName} for ${payload.Price}?";
-            
             // Hide the move notification panel when the buy prompt appears
             MoveNotificationPanel.SetActive(false);
         }
-        
-        private void OnPlayerPassedGo(int pid) { } 
-        private void HandlePropertyBought(PropertyPayload payload) { } 
-        private void HandleRentPaid(RentPayload payload) { } 
-
-        #endregion
-
-        #region UI Callbacks
 
         /// <summary>
         /// Called by the "Scan Answer" button.
@@ -256,10 +248,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void OnSpellingSubmit()
         {
-            TurnController tc = FindObjectOfType<TurnController>();
+            if (_turnController == null) return;
+
             GameEvents.RaiseSpellingAnswer(new SpellingAnswerPayload
             {
-                PlayerID = tc.CurrentPlayerID,
+                PlayerID = _turnController.CurrentPlayerID,
                 Answer = SpellingAnswerInput.text
             });
             SpellingPanel.SetActive(false);
@@ -280,12 +273,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void OnBuyPass()
         {
-            FindObjectOfType<TurnController>().EndTurn();
+            if (_turnController != null) 
+                _turnController.EndTurn();
+            
             BuyPanel.SetActive(false);
             GameEvents.RaiseLogMessage("Player passed on purchase.");
         }
-
-        #endregion
 
         /// <summary>
         /// Handles the OnLogMessage event, updating both the persistent log
@@ -293,7 +286,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.UI
         /// </summary>
         private void AddLog(string message)
         {
-            // 1. Update the persistent log
             Debug.Log(message);
             if (LogText != null)
             {

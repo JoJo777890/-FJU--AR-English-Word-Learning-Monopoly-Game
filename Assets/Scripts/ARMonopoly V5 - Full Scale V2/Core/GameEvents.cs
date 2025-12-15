@@ -19,7 +19,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         PlayerTurn,
         
         /// <summary>
-        /// Player has clicked "Roll", waiting for physical die scan.
+        /// Player has clicked "Start Turn!", waiting for physical die scan.
         /// </summary>
         AwaitingDiceRoll,
         

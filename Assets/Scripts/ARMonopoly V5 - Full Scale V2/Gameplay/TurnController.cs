@@ -10,8 +10,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
     /// <summary>
     /// Manages the player turn order and dice rolling logic.
     /// Attached to the [GameSystems] GameObject.
+    /// Dependencies are injected by AppGame.
     /// </summary>
-    [RequireComponent(typeof(DiceScanner))] // Ensure DiceScanner is on this object
     public class TurnController : MonoBehaviour
     {
         [Header("Config")]
@@ -26,22 +26,19 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private GameStateMachine _stateMachine;
         private Dictionary<int, PlayerTag> _playerTags = new Dictionary<int, PlayerTag>();
         private BoardDefinition _board;
-        private DiceScanner _diceScanner; // <-- I added: Reference to the scanner
+        private DiceScanner _diceScanner;
+        private AppGame _appGameContext; // Only for ExpectedDestinationPropertyID
 
-        private void Start()
+        /// <summary>
+        /// Injection Method. Called by AppGame.
+        /// </summary>
+        public void Construct(GameStateMachine stateMachine, BoardDefinition board, DiceScanner scanner, AppGame appGame)
         {
-            // Cache core system references
-            _stateMachine = AppGame.Instance.StateMachine;
-            _board = AppGame.Instance.Board;
-            _diceScanner = GetComponent<DiceScanner>(); // <-- I added: Get the scanner
+            _stateMachine = stateMachine;
+            _board = board;
+            _diceScanner = scanner;
+            _appGameContext = appGame;
 
-            if (_board == null)
-                Debug.LogError("TurnController: BoardDefinition is not assigned in AppGame!");
-            if (_stateMachine == null)
-                Debug.LogError("TurnController: StateMachine is null!");
-            if (_diceScanner == null)
-                Debug.LogError("TurnController: DiceScanner component not found!");
-            
             // Cache all PlayerTag components in the scene for fast lookup
             foreach (var playerTag in FindObjectsOfType<PlayerTag>())
             {
@@ -55,13 +52,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             // Start the first turn
             EndTurn();
         }
-        
-        // --- I added: Subscribe to the dice roll event ---
-        private void OnEnable()
+
+        private void OnEnable() 
         {
             GameEvents.OnDiceRolled += HandleDiceRoll;
         }
-
         private void OnDisable()
         {
             GameEvents.OnDiceRolled -= HandleDiceRoll;
@@ -74,7 +69,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         public void OnRollClicked()
         {
             if (_stateMachine.CurrentState != GameState.PlayerTurn) return;
-
+            
             // 1. Change state to AwaitingDiceRoll
             _stateMachine.SetState(GameState.AwaitingDiceRoll);
             
@@ -90,10 +85,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             // Only react if it's the current player's roll
             if (playerID != CurrentPlayerID) return;
             
-            // Log the physical roll
+            // 1. Log the physical roll
             GameEvents.RaiseLogMessage($"Player {CurrentPlayerID} rolled a {totalRoll}.");
-
-            // --- This is the logic moved from the old OnRollClicked ---
 
             // 2. Get Player's current position
             if (!_playerTags.ContainsKey(CurrentPlayerID))
@@ -101,10 +94,11 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 Debug.LogError($"PlayerTag for PlayerID {CurrentPlayerID} not found!");
                 return;
             }
+
             PlayerTag player = _playerTags[CurrentPlayerID];
             int oldIndex = player.CurrentBoardIndex;
             int boardSize = _board.TotalSpaces;
-
+            
             if (boardSize == 0)
             {
                 Debug.LogError("BoardDefinition has 0 properties in its list!");
@@ -113,7 +107,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
             // 3. Calculate new logical position (using the physical 'totalRoll')
             int newIndex = (oldIndex + totalRoll) % boardSize;
-            player.CurrentBoardIndex = newIndex; // Update the player's logical state
+            player.CurrentBoardIndex = newIndex;
 
             // 4. Check for "Pass Go"
             if (newIndex < oldIndex) // They wrapped around the board
@@ -128,9 +122,9 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 Debug.LogError($"No property found at index {newIndex}!");
                 return;
             }
-
+            
             // 6. Store expected destination and notify UI
-            AppGame.Instance.ExpectedDestinationPropertyID = destination.PropertyID;
+            _appGameContext.ExpectedDestinationPropertyID = destination.PropertyID;
             GameEvents.RaiseMoveRequired(new MovePayload
             {
                 PlayerID = CurrentPlayerID,
@@ -139,11 +133,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             });
             
             GameEvents.RaiseLogMessage($"Player {CurrentPlayerID} must move to {destination.DisplayName}.");
-
+            
             // 7. Change state to wait for the physical move
             _stateMachine.SetState(GameState.AwaitingPlayerMove);
         }
-
 
         /// <summary>
         /// Called by RuleEngine AFTER a landing is resolved or passed.

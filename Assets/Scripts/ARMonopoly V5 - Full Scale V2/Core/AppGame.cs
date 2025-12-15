@@ -1,22 +1,21 @@
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
+using ARMonopoly_V5___Full_Scale_V2.Gameplay;
+using ARMonopoly_V5___Full_Scale_V2.Player;
+using ARMonopoly_V5___Full_Scale_V2.Property;
+using ARMonopoly_V5___Full_Scale_V2.UI;
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Core
 {
     /// <summary>
-    /// Central singleton (Monobehaviour) that holds references to core systems
-    /// and ScriptableObject data assets. Attached to the [GameSystems] GameObject.
+    /// The Composition Root. 
+    /// Responsible for creating services and injecting dependencies into all scene objects.
     /// </summary>
-    [DefaultExecutionOrder(-100)]
+    [DefaultExecutionOrder(-1000)] // Ensures this runs before ANYTHING else
     public class AppGame : MonoBehaviour
     {
-        /// <summary>
-        /// Static singleton instance for easy global access.
-        /// </summary>
-        public static AppGame Instance { get; private set; }
-
         [Header("Data Assets")]
         // (Tip): Global game settings (starting money, etc.)
         public GameConfig Config;
@@ -28,6 +27,16 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
         public RentCalculator RentCalculator;
         // (Tip): Database of all SpellingQuestion assets.
         public SpellingQuestionDatabase SpellingDB;
+
+        [Header("Scene References")]
+        [Tooltip("Reference to the UIManager in the scene.")]
+        public UIManager UIManager;
+        [Tooltip("Reference to the TurnController in the scene.")]
+        public TurnController TurnController;
+        [Tooltip("Reference to the RuleEngine in the scene.")]
+        public RuleEngine RuleEngine;
+        [Tooltip("Reference to the DiceScanner in the scene.")]
+        public DiceScanner DiceScanner;
 
         [Header("Core Systems")]
         /// <summary>Service for managing all player wallets and property ownership.</summary>
@@ -41,26 +50,56 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
 
         void Awake()
         {
-            // Enforce singleton pattern
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
+            if (CheckMissingReferences()) return;
 
-            // Initialize core non-MonoBehaviour systems
+            // 1. Create Core Services
             Bank = new Bank();
             StateMachine = new GameStateMachine();
-            
-            // Note: PlayerTag.cs instances will register themselves with the Bank
-            // during their own Start() phase to ensure AppGame is ready.
-            
-            if (Config == null) Debug.LogError("AppGame: GameConfig is not assigned!");
-            if (SpellingDB == null) Debug.LogError("AppGame: SpellingDB is not assigned!");
 
+            Debug.Log("[AppGame] Services Created. Starting Injection...");
 
-            Debug.Log("[AppGame] Initialized.");
+            // 2. Inject into Core Logic Scripts
+            // Pass the specific dependencies each script needs.
+            TurnController.Construct(StateMachine, Board, DiceScanner, this); // Passing 'this' only for ExpectedDestinationPropertyID access
+            RuleEngine.Construct(Bank, Board, RentCalculator, StateMachine, TurnController, SpellingDB, this);
+            UIManager.Construct(TurnController);
+
+            // 3. Inject into Properties (Find all in scene)
+            var allProps = FindObjectsOfType<PropertyVisuals>(true);
+            foreach (var prop in allProps)
+            {
+                prop.Construct(Config);
+            }
+
+            // 4. Inject into Players (Find all in scene)
+            var allPlayers = FindObjectsOfType<PlayerTag>(true);
+            foreach (var player in allPlayers)
+            {
+                player.Construct(Bank, Config, Board);
+            }
+
+            var allTriggers = FindObjectsOfType<PlayerTokenTrigger>(true);
+            foreach (var trigger in allTriggers)
+            {
+                trigger.Construct(Config);
+            }
+
+            Debug.Log("[AppGame] Dependency Injection Complete.");
+        }
+
+        private bool CheckMissingReferences()
+        {
+            if (!Config || !PropertyDB || !Board || !RentCalculator || !SpellingDB)
+            {
+                Debug.LogError("[AppGame] Missing Data Assets!");
+                return true;
+            }
+            if (!UIManager || !TurnController || !RuleEngine || !DiceScanner)
+            {
+                Debug.LogError("[AppGame] Missing Scene References! Assign them in Inspector.");
+                return true;
+            }
+            return false;
         }
     }
 }

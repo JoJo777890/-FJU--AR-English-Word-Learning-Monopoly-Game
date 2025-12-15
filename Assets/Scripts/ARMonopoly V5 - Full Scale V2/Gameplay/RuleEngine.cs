@@ -20,28 +20,25 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private GameStateMachine _stateMachine;
         private TurnController _turnController;
         private SpellingQuestionDatabase _spellingDB;
+        private AppGame _appGameContext;
 
-        // Runtime state for the current spelling question
+        // For the current spelling question
         private SpellingQuestion _currentQuestion;
         private string _propertyInQuestionID;
         private List<int> _investors = new List<int>();
 
         /// <summary>
-        /// Caches all required system references from AppGame.
+        /// Injection Method.
         /// </summary>
-        private void Awake()
+        public void Construct(Bank bank, BoardDefinition board, RentCalculator rentCalc, GameStateMachine stateMachine, TurnController turnController, SpellingQuestionDatabase spellingDB, AppGame appGame)
         {
-            _bank = AppGame.Instance.Bank;
-            _board = AppGame.Instance.Board;
-            _rentCalculator = AppGame.Instance.RentCalculator;
-            _stateMachine = AppGame.Instance.StateMachine;
-            _turnController = GetComponent<TurnController>(); // Assumes TurnController is on the same GameObject
-            _spellingDB = AppGame.Instance.SpellingDB;
-
-            if (_bank == null || _board == null || _rentCalculator == null || _stateMachine == null || _turnController == null || _spellingDB == null)
-            {
-                Debug.LogError("RuleEngine: Missing one or more critical references!");
-            }
+            _bank = bank;
+            _board = board;
+            _rentCalculator = rentCalc;
+            _stateMachine = stateMachine;
+            _turnController = turnController;
+            _spellingDB = spellingDB;
+            _appGameContext = appGame;
         }
 
         /// <summary>
@@ -75,17 +72,13 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         private void HandleProximityEnter(ProximityPayload payload)
         {
             // 1. Is the game waiting for this move?
-            if (_stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
-
+            if (_stateMachine == null || _stateMachine.CurrentState != GameState.AwaitingPlayerMove) return;
+            
             // 2. Is it the correct player?
             if (payload.PlayerID != _turnController.CurrentPlayerID) return;
-
+            
             // 3. Is it the correct destination?
-            if (payload.PropertyID != AppGame.Instance.ExpectedDestinationPropertyID)
-            {
-                // Player landed on the wrong property, keep waiting.
-                return;
-            }
+            if (payload.PropertyID != _appGameContext.ExpectedDestinationPropertyID) return; // Player landed on the wrong property, keep waiting.
 
             // --- Proximity Verified ---
             Debug.Log($"Player {payload.PlayerID} correctly landed on {payload.PropertyID}.");
@@ -108,11 +101,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
             else
             {
-                GameEvents.RaiseLogMessage("Error: No spelling questions found in DB! Skipping turn.");
                 _turnController.EndTurn();
             }
         }
-        
+
         /// <summary>
         /// Handles the OnPlayerInvest event, triggered by the UI.
         /// </summary>
@@ -120,7 +112,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         {
             if (_stateMachine.CurrentState != GameState.AwaitingSpellingAnswer) return;
 
-            PropertyDef prop = AppGame.Instance.PropertyDB.GetProperty(_propertyInQuestionID);
+            PropertyDef prop = _appGameContext.PropertyDB.GetProperty(_propertyInQuestionID);
             int investmentAmount = prop.Price / 2;
 
             if (_bank.GetWallet(payload.InvestorID).GetBalance() >= investmentAmount)
@@ -134,7 +126,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 GameEvents.RaiseLogMessage($"Player {payload.InvestorID} cannot afford to invest.");
             }
         }
-        
+
         /// <summary>
         /// Handles the OnSpellingAnswer event, resolves the challenge, and applies rules.
         /// </summary>
@@ -145,13 +137,12 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
 
             bool isCorrect = payload.Answer.ToUpper() == _currentQuestion.CorrectAnswer.ToUpper();
             int currentPlayerID = payload.PlayerID;
-            PropertyDef prop = AppGame.Instance.PropertyDB.GetProperty(_propertyInQuestionID);
+            PropertyDef prop = _appGameContext.PropertyDB.GetProperty(_propertyInQuestionID);
 
             if (isCorrect)
             {
                 GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered CORRECTLY! ({payload.Answer.ToUpper()})");
                 
-                // Reward all investors
                 foreach (var investorID in _investors)
                 {
                     _bank.RewardInvestment(investorID, prop.Price / 2);
@@ -179,7 +170,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
             else // Answer was incorrect
             {
-                GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered INCORRECTLY. (Was: {payload.Answer.ToUpper()}, Ans: {_currentQuestion.CorrectAnswer.ToUpper()})");
+                GameEvents.RaiseLogMessage($"Player {currentPlayerID} answered INCORRECTLY.");
                 
                 if(_investors.Count > 0)
                     GameEvents.RaiseLogMessage("Investors have lost their investment.");
@@ -213,7 +204,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                 }
             }
         }
-        
+
         /// <summary>
         /// Handles the OnBuyRequest event, triggered by the UI.
         /// </summary>
@@ -224,7 +215,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             if (_stateMachine.CurrentState != GameState.ResolvingSpelling && _stateMachine.CurrentState != GameState.ResolvingSpace) return;
             
             int playerID = _turnController.CurrentPlayerID;
-            PropertyDef propToBuy = AppGame.Instance.PropertyDB.GetProperty(propertyID);
+            PropertyDef propToBuy = _appGameContext.PropertyDB.GetProperty(propertyID);
 
             if (_bank.BuyProperty(playerID, propToBuy))
             {
@@ -239,7 +230,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
             }
             else
             {
-                GameEvents.RaiseLogMessage($"Player {playerID} failed to buy {propToBuy.DisplayName}. (Not enough money or already owned)");
+                GameEvents.RaiseLogMessage($"Player {playerID} failed to buy {propToBuy.DisplayName}.");
             }
 
             // Whether buy succeeded or failed, the action is resolved. End the turn.
@@ -251,7 +242,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
         /// </summary>
         private void HandlePassedGo(int playerID)
         {
-            int passGoMoney = AppGame.Instance.Config.PassGoMoney;
+            int passGoMoney = _appGameContext.Config.PassGoMoney;
             Wallet wallet = _bank.GetWallet(playerID);
             if (wallet != null)
             {

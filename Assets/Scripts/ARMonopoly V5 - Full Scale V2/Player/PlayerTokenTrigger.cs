@@ -11,33 +11,30 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
     /// Fires proximity events, but does not control visuals.
     /// Attached to the Player's Image Target.
     /// </summary>
-    [RequireComponent(typeof(PlayerTag), typeof(ObserverBehaviour))]
     public class PlayerTokenTrigger : MonoBehaviour
     {
         private PlayerTag _playerTag;
         private ObserverBehaviour _playerObserver;
         private GameConfig _config;
-
+        
         // Tracks which property this player is currently "in" to avoid firing events every frame.
         private string _currentProximityID = null;
+        
+        private bool _isInitialized = false;
 
         /// <summary>
         /// Caches required components and GameConfig.
         /// </summary>
-        void Start()
+        void Awake()
         {
             _playerTag = GetComponent<PlayerTag>();
             _playerObserver = GetComponent<ObserverBehaviour>();
-            
-            if (AppGame.Instance == null)
-            {
-                Debug.LogError($"PlayerTokenTrigger (P{_playerTag.PlayerID}): AppGame.Instance is not ready!");
-                return;
-            }
-            _config = AppGame.Instance.Config;
+        }
 
-            if (_config == null)
-                Debug.LogError($"PlayerTokenTrigger (P{_playerTag.PlayerID}): GameConfig not found!");
+        public void Construct(GameConfig config)
+        {
+            _config = config;
+            _isInitialized = true;
         }
 
         /// <summary>
@@ -45,7 +42,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         /// </summary>
         void Update()
         {
-            if (_playerObserver == null || _config == null || _playerTag == null) return;
+            if (!_isInitialized || _playerObserver == null || _playerTag == null) return;
 
             // Only check if this player's token is being tracked
             if (_playerObserver.TargetStatus.Status < Status.TRACKED)
@@ -61,7 +58,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
             // Find the closest *tracked* property from the static list in PropertyVisuals
             foreach (var prop in PropertyVisuals.AllTrackedProperties)
             {
-                if (prop == null) continue; // Safety check
+                if (prop == null) continue;
                 
                 float dist = Vector3.Distance(transform.position, prop.transform.position);
                 if (dist < closestDist)

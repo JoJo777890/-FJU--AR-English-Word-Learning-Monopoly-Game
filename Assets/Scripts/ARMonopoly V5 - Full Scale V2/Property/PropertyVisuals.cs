@@ -11,7 +11,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
     /// Also maintains the static list of all currently tracked properties.
     /// Attached to the Property's Image Target.
     /// </summary>
-    [RequireComponent(typeof(PropertyTag), typeof(ObserverBehaviour))]
     public class PropertyVisuals : MonoBehaviour
     {
         /// <summary>
@@ -28,6 +27,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
         
         // Tracks which players are currently near *this* property
         private HashSet<int> _playersInProximity = new HashSet<int>();
+        
+        private bool _isInitialized = false;
 
         void Awake()
         {
@@ -35,9 +36,10 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
             _propertyObserver = GetComponent<ObserverBehaviour>();
         }
 
-        void Start()
+        // Called by AppGame
+        public void Construct(GameConfig config)
         {
-            _config = AppGame.Instance.Config;
+            _config = config;
             if (_config == null)
             {
                 Debug.LogError($"PropertyVisuals ({_propertyTag.PropertyID}): GameConfig not found!");
@@ -56,6 +58,8 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
             }
             if (_contentChild == null)
                 Debug.LogWarning($"PropertyVisuals ({_propertyTag.PropertyID}): No child found with suffix '{_config.ContentSuffix}' to scale.");
+            
+            _isInitialized = true;
         }
 
         private void OnEnable()
@@ -100,7 +104,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
         /// </summary>
         private void HandleProximityEnter(ProximityPayload payload)
         {
-            // Is this event about *this* property?
             if (payload.PropertyID == _propertyTag.PropertyID)
             {
                 _playersInProximity.Add(payload.PlayerID);
@@ -126,17 +129,13 @@ namespace ARMonopoly_V5___Full_Scale_V2.Property
         /// </summary>
         private void UpdateScale()
         {
-            if (_contentChild == null) return;
+            if (!_isInitialized || _contentChild == null) return;
 
             // If *any* player is nearby, scale up.
             if (_playersInProximity.Count > 0)
-            {
                 _contentChild.localScale = _baseScale * _config.ScaleUpFactor;
-            }
             else
-            {
                 _contentChild.localScale = _baseScale;
-            }
         }
     }
 }

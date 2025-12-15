@@ -1,5 +1,7 @@
+using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Core;
 using ARMonopoly_V5___Full_Scale_V2.Data;
+using ARMonopoly_V5___Full_Scale_V2.Economy;
 using UnityEngine;
 
 namespace ARMonopoly_V5___Full_Scale_V2.Player
@@ -13,7 +15,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         [Header("Config")]
         public int PlayerID;
         public string PlayerName;
-
+        
         // (Tip): The property the player starts on (e.g., 'Go')
         public PropertyDef StartingProperty;
 
@@ -21,30 +23,19 @@ namespace ARMonopoly_V5___Full_Scale_V2.Player
         // (Tip): The player's current logical index on the board (0 = Go).
         public int CurrentBoardIndex = 0;
 
-        private void Start()
+        /// <summary>
+        /// Called by AppGame to inject dependencies and initialize the player.
+        /// </summary>
+        public void Construct(Bank bank, GameConfig config, BoardDefinition board)
         {
-            if (AppGame.Instance == null || AppGame.Instance.Board == null || AppGame.Instance.Config == null)
-            {
-                Debug.LogError($"PlayerTag {PlayerID}: AppGame or its assets are not ready!", this);
-                return;
-            }
-            
             // 1. Register this player with the Bank
-            // This also triggers the initial OnMoneyChanged event for the UI.
-            if (AppGame.Instance.Bank != null)
-            {
-                AppGame.Instance.Bank.RegisterPlayer(PlayerID, AppGame.Instance.Config.StartingMoney);
-                Debug.Log($"PlayerTag {PlayerID} registered with Bank.");
-            }
-            else
-            {
-                Debug.LogError($"PlayerTag {PlayerID}: Could not find Bank to register with!", this);
-            }
-            
-            // 2. Set the logical starting position on the board
+            bank.RegisterPlayer(PlayerID, config.StartingMoney);
+            Debug.Log($"PlayerTag {PlayerID} initialized and registered.");
+
+            // 2. Set Starting Position
             if (StartingProperty != null)
             {
-                int startIndex = AppGame.Instance.Board.GetIndexFromID(StartingProperty.PropertyID);
+                int startIndex = board.GetIndexFromID(StartingProperty.PropertyID);
                 if (startIndex != -1)
                 {
                     CurrentBoardIndex = startIndex;

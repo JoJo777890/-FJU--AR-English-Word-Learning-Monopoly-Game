@@ -9383,6 +9383,10 @@ MonoBehaviour:
   Board: {fileID: 11400000, guid: 643ea5a4ef445854cb7c8aa80c00e133, type: 2}
   RentCalculator: {fileID: 11400000, guid: 37de328a28f3cac46b90593951c83072, type: 2}
   SpellingDB: {fileID: 11400000, guid: 66ff9112000e49141bccf7598365bab5, type: 2}
+  UIManager: {fileID: 1266961586}
+  TurnController: {fileID: 1977099707}
+  RuleEngine: {fileID: 1977099706}
+  DiceScanner: {fileID: 1977099710}
   ExpectedDestinationPropertyID: 
 --- !u!4 &1977099709
 Transform:
@@ -10400,9 +10404,9 @@ SceneRoots:
   - {fileID: 1404864700}
   - {fileID: 1266961585}
   - {fileID: 1727543844}
+  - {fileID: 1417388418}
   - {fileID: 412917481}
   - {fileID: 5418709}
-  - {fileID: 1417388418}
   - {fileID: 979547120}
   - {fileID: 2135861382}
   - {fileID: 377782776}
