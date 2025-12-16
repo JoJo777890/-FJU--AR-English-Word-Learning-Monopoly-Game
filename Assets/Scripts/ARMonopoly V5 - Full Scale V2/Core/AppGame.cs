@@ -1,3 +1,4 @@
+using System;
 using ARMonopoly_V5___Full_Scale_V2.Board;
 using ARMonopoly_V5___Full_Scale_V2.Data;
 using ARMonopoly_V5___Full_Scale_V2.Economy;
@@ -56,35 +57,43 @@ namespace ARMonopoly_V5___Full_Scale_V2.Core
             Bank = new Bank();
             StateMachine = new GameStateMachine();
 
-            Debug.Log("[AppGame] Services Created. Starting Injection...");
+            Debug.Log("[AppGame] Services Created. Injecting Core Components...");
 
             // 2. Inject into Core Logic Scripts
             // Pass the specific dependencies each script needs.
             TurnController.Construct(StateMachine, Board, DiceScanner, this); // Passing 'this' only for ExpectedDestinationPropertyID access
             RuleEngine.Construct(Bank, Board, RentCalculator, StateMachine, TurnController, SpellingDB, this);
             UIManager.Construct(TurnController);
+        }
 
+        void Start()
+        {
+            Debug.Log("[AppGame] Starting Scene Object Injection...");
+            
             // 3. Inject into Properties (Find all in scene)
             var allProps = FindObjectsOfType<PropertyVisuals>(true);
             foreach (var prop in allProps)
             {
                 prop.Construct(Config);
             }
-
+            
             // 4. Inject into Players (Find all in scene)
             var allPlayers = FindObjectsOfType<PlayerTag>(true);
             foreach (var player in allPlayers)
             {
                 player.Construct(Bank, Config, Board);
             }
-
+            
             var allTriggers = FindObjectsOfType<PlayerTokenTrigger>(true);
             foreach (var trigger in allTriggers)
             {
                 trigger.Construct(Config);
             }
-
+            
             Debug.Log("[AppGame] Dependency Injection Complete.");
+            
+            // 5. Start the Game manually (Triggers OnTurnStarted)
+            TurnController.StartGame();
         }
 
         private bool CheckMissingReferences()

@@ -48,8 +48,14 @@ namespace ARMonopoly_V5___Full_Scale_V2.Gameplay
                     _playerTags[playerTag.PlayerID] = playerTag;
                 }
             }
+        }
 
-            // Start the first turn
+        /// <summary>
+        /// Called by AppGame.Start() to kick off the game loop.
+        /// </summary>
+        public void StartGame()
+        {
+            // Sets up the first turn
             EndTurn();
         }
 
