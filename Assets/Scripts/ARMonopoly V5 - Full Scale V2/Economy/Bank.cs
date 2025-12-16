@@ -85,7 +85,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Economy
 
             if (payerWallet == null || ownerWallet == null) return false;
             
-            // TODO: Handle bankruptcy logic if payerWallet.GetBalance() < amount
+            // TODO: Implement bankruptcy logic if payerWallet.GetBalance() < amount
             
             payerWallet.Remove(amount);
             ownerWallet.Add(amount);

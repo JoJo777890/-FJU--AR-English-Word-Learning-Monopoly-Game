@@ -22,6 +22,6 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
         public int BaseRent;
         
         // TODO: Add RentTiers[] for houses/hotels
-        // TODO: Add ColorGroup (string or enum) for monopoly logic
+        // TODO: Add ColorGroup (enum) for monopoly logic
     }
 }

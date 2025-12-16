@@ -16,8 +16,7 @@ namespace ARMonopoly_V5___Full_Scale_V2.Data
         {
             if (property == null) return 0;
             
-            // TODO: Expand logic to check for monopolies (using Bank.GetPropertyOwner)
-            // and houses/hotels once those are implemented.
+            // TODO: Implement houses/hotels
             return property.BaseRent;
         }
     }
