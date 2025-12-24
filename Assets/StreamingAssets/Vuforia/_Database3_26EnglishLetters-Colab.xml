@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QCARConfig>
+  <Tracking>
+    <ImageTarget name="ImageTarget_z2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_y2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_x2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_w2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_v2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_u2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_t2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_s2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_r2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_q2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_p2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_o2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_n2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_m2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_l2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_k2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_j2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_i2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_h2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_g2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_f2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_e2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_d2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_c2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_b2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_a2" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_z1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_y1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_x1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_w1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_v1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_u1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_t1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_s1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_r1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_q1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_p1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_o1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_n1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_m1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_l1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_k1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_j1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_i1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_h1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_g1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_f1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_e1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_d1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_c1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_b1" size="0.050000 0.050000" />
+    <ImageTarget name="ImageTarget_a1" size="0.050000 0.050000" />
+  </Tracking>
+</QCARConfig>
